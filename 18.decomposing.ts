@@ -23,15 +23,12 @@ export class G964 {
     const target = this.getSquare(n);
 
     const result: number[] = [];
-
-    function getSumThatEqualsTo(
-      list: { num: number; square: number }[],
-      target: number
-    ): boolean {
+    // length: max squares to make up the target
+    function getSumThatEqualsTo(length: number, target: number): boolean {
       console.log(`target:${target}`);
       // loop from large to small
-      for (let i = list.length - 1; i >= 0; i--) {
-        const cur = list[i];
+      for (let i = length; i >= 0; i--) {
+        const cur = squares[i];
         // if larger than target, continue to next loop
         if (cur.square > target) {
           continue;
@@ -45,7 +42,7 @@ export class G964 {
         // if less than the target, then make the target of target-square,
         // and call getSumThatEqualsTo with sub list & new target
         if (cur.square < target) {
-          const ok = getSumThatEqualsTo(list.slice(0, i), target - cur.square);
+          const ok = getSumThatEqualsTo(i - 1, target - cur.square);
           // if child getSumThatEqualsTo returns true, that makes this number is part of the result
           if (ok) {
             result.push(cur.num);
@@ -60,7 +57,7 @@ export class G964 {
       return false;
     }
 
-    const hasResult = getSumThatEqualsTo(squares, target);
+    const hasResult = getSumThatEqualsTo(squares.length - 1, target);
 
     console.log(result);
     return hasResult ? result : null;
