@@ -10,7 +10,7 @@ export class G964 {
     return square;
   }
 
-  private static cachedSquares: { num: number; square: number }[] = [];
+  private static cachedSquares: number[] = [];
 
   private static getSquares(length: number) {
     const thisClass = this;
@@ -22,7 +22,7 @@ export class G964 {
       ...this.cachedSquares,
       ...[...Array(length - 1 - cachedLength)].map(function (_, index) {
         const num = index + 1 + cachedLength;
-        return { num, square: thisClass.getSquare(num) };
+        return thisClass.getSquare(num);
       }),
     ];
     this.cachedSquares = squares;
@@ -33,7 +33,7 @@ export class G964 {
   public static decompose(n: number) {
     console.log(`decompose(${n})`);
     const thisClass = this;
-    const squares: { num: number; square: number }[] = this.getSquares(n);
+    const squares: number[] = this.getSquares(n);
     const target = this.getSquare(n);
 
     const result: number[] = [];
@@ -44,22 +44,22 @@ export class G964 {
       for (let i = length; i >= 0; i--) {
         const cur = squares[i];
         // if larger than target, continue to next loop
-        if (cur.square > target) {
+        if (cur > target) {
           continue;
         }
         // if equals to the targer, then all is over and cleared
-        if (cur.square == target) {
-          result.push(cur.num);
+        if (cur == target) {
+          result.push(i + 1);
           // console.log(`pushed:${cur.num}`);
           return true;
         }
         // if less than the target, then make the target of target-square,
         // and call getSumThatEqualsTo with sub list & new target
-        if (cur.square < target) {
-          const ok = getSumThatEqualsTo(i - 1, target - cur.square);
+        if (cur < target) {
+          const ok = getSumThatEqualsTo(i - 1, target - cur);
           // if child getSumThatEqualsTo returns true, that makes this number is part of the result
           if (ok) {
-            result.push(cur.num);
+            result.push(i + 1);
             // console.log(`pushed:${cur.num}`);
             return true;
             // else this number is not part of the result, then continue to next number
