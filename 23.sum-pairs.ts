@@ -12,7 +12,7 @@ export function sumPairs(ints: number[], s: number): [number, number] | void {
     const rest = s - num;
     const restIndex = findIndexBetween(rest, i + 1, maxIndex - 1);
     // if exists
-    if (restIndex > i && restIndex < maxIndex) {
+    if (restIndex != -1) {
       res = [num, rest];
       maxIndex = restIndex;
     }
