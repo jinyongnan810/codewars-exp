@@ -21,8 +21,14 @@ export class G964 {
           factor += 1;
           n_bk /= i;
           if (this.isPrime(n_bk)) {
-            factors[`${i}`] = factor;
-            factors[`${n_bk}`] = 1;
+            // memo: deal with cases like 16
+            if (n_bk != i) {
+              factors[`${i}`] = factor;
+              factors[`${n_bk}`] = 1;
+            } else {
+              factor++;
+              factors[`${i}`] = factor;
+            }
             break total;
           }
         }
