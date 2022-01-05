@@ -1,7 +1,7 @@
 // https://www.codewars.com/kata/55cf3b567fc0e02b0b00000b/train/typescript
 
 export class G964 {
-  private static partitionCache: { [key: number]: number[][] } = [];
+  private static partitionCache: { [key: number]: number[][] } = {};
   private static getPartitions(n: number): number[][] {
     if (n == 1) return [[1]];
     if (this.partitionCache[n]) return this.partitionCache[n];
