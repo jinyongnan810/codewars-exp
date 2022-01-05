@@ -5,37 +5,20 @@ export class G964 {
   private static getPartitions(n: number): number[][] {
     if (n == 1) return [[1]];
     if (this.partitionCache[n]) return this.partitionCache[n];
-    const partition: number[][] = [];
-    for (let arrayLength = 1; arrayLength <= n; arrayLength++) {
-      if (arrayLength == 1) partition.push([n]);
-      else if (arrayLength == 2) {
-        let a = n - 1;
-        let b = 1;
-        while (a >= b) {
-          partition.push([a, b]);
-          a--;
-          b++;
-        }
-      } else if (arrayLength == n) {
-        partition.push([...Array(n)].map((x) => 1));
-      } else {
-        const partitionNMinus1 = this.getPartitions(n - 1);
-        const sameLengthArrs = partitionNMinus1.filter(
-          (arr) => arr.length == arrayLength
+    const partitions: number[][] = [];
+    partitions.push([n]);
+    partitions.push([...Array(n)].map((x) => 1));
+    if (n >= 3) {
+      for (let i = n - 1; i >= 2; i--) {
+        const partitionsForI = this.getPartitions(n - i);
+        const filtered = partitionsForI.filter(
+          (partitionForI) => !partitionForI.some((x) => x > i)
         );
-        sameLengthArrs.forEach((arr) => {
-          for (let i = 0; i < arr.length; i++) {
-            if (i == 0 || arr[i - 1] > arr[i]) {
-              const toBeAdded = [...arr];
-              toBeAdded[i]++;
-              partition.push(toBeAdded);
-            }
-          }
-        });
+        filtered.forEach((f) => partitions.push([i, ...f]));
       }
     }
-    this.partitionCache[n] = partition;
-    return partition;
+    this.partitionCache[n] = partitions;
+    return partitions;
   }
   private static getProducts = (partitions: number[][]): number[] => {
     const products = partitions.map((partition) =>
@@ -47,7 +30,7 @@ export class G964 {
   public static part(n: number) {
     // get partitions
     const point1 = Date.now();
-    const partitions = this.getPartitions(n); // has duplicates
+    const partitions = this.getPartitions(n);
     const point2 = Date.now();
     // console.log(`partitions:${JSON.stringify(partitions)}`);
     // console.log(`cache:${JSON.stringify(this.partitionCache)}`);
@@ -76,9 +59,3 @@ export class G964 {
     )} Median: ${median.toFixed(2)}`;
   }
 }
-
-// 15 [LOG]: "getPartitions:27, getProducts:5, get result:0"
-// 16 [LOG]: "getPartitions:133, getProducts:7, get result:0"
-// 17 [LOG]: "getPartitions:269, getProducts:20, get result:0"
-// 18 [LOG]: "getPartitions:797, getProducts:46, get result:1"
-// 19 [LOG]: "getPartitions:2201, getProducts:181, get result:0"
