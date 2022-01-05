@@ -5,20 +5,33 @@ export class G964 {
   private static getPartitions(n: number): number[][] {
     if (n == 1) return [[1]];
     if (this.partitionCache[n]) return this.partitionCache[n];
-    const nMinus1Partition = this.getPartitions(n - 1);
     const partition: number[][] = [];
-    for (let i = 0; i < nMinus1Partition.length; i++) {
-      const partitionBefore = nMinus1Partition[i];
-      for (let p = 0; p < partitionBefore.length; p++) {
-        if (p == partitionBefore.length - 1) {
-          const toBeAdded = [...partitionBefore, 1];
-          partition.push(toBeAdded);
+    for (let arrayLength = 1; arrayLength <= n; arrayLength++) {
+      if (arrayLength == 1) partition.push([n]);
+      else if (arrayLength == 2) {
+        let a = n - 1;
+        let b = 1;
+        while (a >= b) {
+          partition.push([a, b]);
+          a--;
+          b++;
         }
-        if (p == 0 || partitionBefore[p - 1] > partitionBefore[p]) {
-          const toBeAdded = [...partitionBefore];
-          toBeAdded[p]++;
-          partition.push(toBeAdded);
-        }
+      } else if (arrayLength == n) {
+        partition.push([...Array(n)].map((x) => 1));
+      } else {
+        const partitionNMinus1 = this.getPartitions(n - 1);
+        const sameLengthArrs = partitionNMinus1.filter(
+          (arr) => arr.length == arrayLength
+        );
+        sameLengthArrs.forEach((arr) => {
+          for (let i = 0; i < arr.length; i++) {
+            if (i == 0 || arr[i - 1] > arr[i]) {
+              const toBeAdded = [...arr];
+              toBeAdded[i]++;
+              partition.push(toBeAdded);
+            }
+          }
+        });
       }
     }
     this.partitionCache[n] = partition;
@@ -34,7 +47,8 @@ export class G964 {
   public static part(n: number) {
     // get partitions
     const partitions = this.getPartitions(n); // has duplicates
-    // console.log(`partitions:${JSON.stringify(partitions)}`);
+    console.log(`partitions:${JSON.stringify(partitions)}`);
+    console.log(`cache:${JSON.stringify(partitions)}`);
     // get products
     const products = this.getProducts(partitions);
     // console.log(`products:${JSON.stringify(products)}`);
