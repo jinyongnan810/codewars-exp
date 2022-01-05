@@ -46,12 +46,16 @@ export class G964 {
   };
   public static part(n: number) {
     // get partitions
+    const point1 = Date.now();
     const partitions = this.getPartitions(n); // has duplicates
-    console.log(`partitions:${JSON.stringify(partitions)}`);
-    console.log(`cache:${JSON.stringify(partitions)}`);
+    const point2 = Date.now();
+    // console.log(`partitions:${JSON.stringify(partitions)}`);
+    // console.log(`cache:${JSON.stringify(this.partitionCache)}`);
     // get products
     const products = this.getProducts(partitions);
+    const point3 = Date.now();
     // console.log(`products:${JSON.stringify(products)}`);
+
     // get final results
     const len = products.length;
     const range = products[len - 1] - products[0];
@@ -60,8 +64,21 @@ export class G964 {
       len % 2 == 0
         ? (products[len / 2] + products[len / 2 - 1]) / 2
         : products[Math.floor(len / 2)];
+    const point4 = Date.now();
+
+    console.log(
+      `getPartitions:${point2 - point1}, getProducts:${
+        point3 - point2
+      }, get result:${point4 - point3}`
+    );
     return `Range: ${range} Average: ${average.toFixed(
       2
     )} Median: ${median.toFixed(2)}`;
   }
 }
+
+// 15 [LOG]: "getPartitions:27, getProducts:5, get result:0"
+// 16 [LOG]: "getPartitions:133, getProducts:7, get result:0"
+// 17 [LOG]: "getPartitions:269, getProducts:20, get result:0"
+// 18 [LOG]: "getPartitions:797, getProducts:46, get result:1"
+// 19 [LOG]: "getPartitions:2201, getProducts:181, get result:0"
