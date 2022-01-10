@@ -6,6 +6,27 @@
 
 ---
 
+#### Day 24-31
+
+- From [29-36](https://github.com/jinyongnan810/codewars-exp/compare/38095907341c16f98523a1ceee2d46e5cb9387b7...6cbce97cfdb497bb72669960be8265b9c84be2e6)
+- Whiteboard drawing really helps.
+- When compare string
+
+```ts
+// use > / < is probably better idea
+mixCounts.sort((a, b) => {
+  if (a.length > b.length) return -1;
+  if (a.length < b.length) return 1;
+  if (a > b) return 1;
+  else if (a < b) return -1;
+  return 0;
+});
+// and using localeCompare may give unexpected results.
+a.localeCompare(b);
+```
+
+---
+
 #### Day 18-23
 
 - From [22-28](https://github.com/jinyongnan810/codewars-exp/compare/16f2446ba5c6fd02908de5937976271f44983fe1...550707142dea809ff21371396d3ed6ca2858a164)
