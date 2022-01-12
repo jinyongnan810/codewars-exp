@@ -6,6 +6,12 @@
 
 ---
 
+#### Day 32-33
+- [Binary divide by 5](https://github.com/jinyongnan810/codewars-exp/blob/master/37.divide-by-5.ts)
+- convert nfa to regex
+![nfa-to-regex](https://user-images.githubusercontent.com/29720903/149097813-28831afb-9578-4f1a-80a3-6bea4ff47d2a.png)
+
+
 #### Day 24-31
 
 - From [29-36](https://github.com/jinyongnan810/codewars-exp/compare/38095907341c16f98523a1ceee2d46e5cb9387b7...6cbce97cfdb497bb72669960be8265b9c84be2e6)
