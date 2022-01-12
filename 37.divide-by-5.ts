@@ -3,12 +3,12 @@
 export const divisibleByFive = {
   test: (x: string) => {
     console.log(x);
-    return /^0*(((1(10)*0)|(1(10)*11))((01*01)*|((01*000)|(01*0011))*)1)+0*$/.test(
+    return /^0*(((1(10)*0)|(1(10)*11))((01*01)|((01*00)(10)*(0|11)))*1)+0*$/.test(
       x
     );
   },
 };
-// not work with 10011010001001, need revision
+// not work with 1110011000101, need revision
 
 // http://ivanzuzak.info/noam/webapps/fsm2regex/
 // #states
