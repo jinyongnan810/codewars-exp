@@ -8,7 +8,6 @@ export const divisibleByFive = {
     );
   },
 };
-// not work with 1110011000101, need revision
 
 // http://ivanzuzak.info/noam/webapps/fsm2regex/
 // #states
