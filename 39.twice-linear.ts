@@ -24,9 +24,6 @@ const getFinalArray = (layers: number[][]): number[] => {
   return sortedArrayCache;
 };
 export function dblLinear(n: number): number {
-  if (n < sortedArrayCache.length) {
-    return sortedArrayCache[n];
-  }
   // calc how many layers are needed
   let layersNeeded = 1;
   let maxNum = 1;
@@ -37,6 +34,10 @@ export function dblLinear(n: number): number {
   // do two more
   layersNeeded += 3;
   console.log(`layersNeeded:${layersNeeded}`);
+  if (layersNeeded <= layersCache.length) {
+    console.log(`get from cache`);
+    return sortedArrayCache[n];
+  }
   // calc the layers
   const layers = getToLayerX(layersNeeded);
   // get sorted array
@@ -44,4 +45,27 @@ export function dblLinear(n: number): number {
   //   console.log(`final array:${JSON.stringify(sorted)}`);
   // result
   return sorted[n];
+}
+
+export function dblLinear_others(n: number): number {
+  let array = [1];
+  let x = 0;
+  let y = 0;
+
+  for (let i = 0; i < n; i++) {
+    let nextX = 2 * array[x] + 1;
+    let nextY = 3 * array[y] + 1;
+
+    if (nextX <= nextY) {
+      array.push(nextX);
+      x++;
+
+      if (nextX === nextY) y++;
+    } else {
+      array.push(nextY);
+      y++;
+    }
+  }
+
+  return array[n];
 }
