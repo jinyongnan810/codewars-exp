@@ -4,6 +4,11 @@
 
 - Loosen the mind & have fun.
 
+#### Day 32-40
+- create a huffman-tree
+![huffman-tree](https://user-images.githubusercontent.com/29720903/150036931-0e36753a-f4e4-4448-89fd-bbbf5b38de65.png)
+
+
 ---
 
 #### Day 32-33
