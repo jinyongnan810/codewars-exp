@@ -14,10 +14,14 @@ class HuffmanNode {
   char?: string;
   left: HuffmanNode | null;
   right: HuffmanNode | null;
+  parent: HuffmanNode | null;
+  side: "0" | "1" | null;
   constructor(value: number, char?: string) {
     this.value = value;
     this.left = null;
     this.right = null;
+    this.parent = null;
+    this.side = null;
     this.char = char;
   }
 }
@@ -38,14 +42,64 @@ const createHuffmanTree = (freqs: [string, number][]) => {
     const newNode = new HuffmanNode(first.value + second.value);
     newNode.left = first;
     newNode.right = second;
+    first.parent = newNode;
+    first.side = "0";
+    second.parent = newNode;
+    second.side = "1";
     nodes.push(newNode);
   }
   return nodes[0];
 };
 
+const encodeChars = (tree: HuffmanNode): { [char: string]: string } => {
+  const res: { [char: string]: string } = {};
+  const stack: HuffmanNode[] = [];
+  stack.push(tree);
+  while (stack.length > 0) {
+    const top = stack.pop();
+    if (!top) break;
+    // end leaf
+    if (top.left == null && top.right == null) {
+      if (top.char) {
+        res[top.char] =
+          stack.map((node) => node.side ?? "").join("") + top.side;
+      }
+      if (top.parent) {
+        switch (top.side) {
+          case "1": {
+            top.parent.right = null;
+            break;
+          }
+          case "0": {
+            top.parent.left = null;
+          }
+          default:
+            break;
+        }
+      }
+    }
+    // has child
+    else if (top.left != null) {
+      stack.push(top);
+      stack.push(top.left);
+    } else if (top.right != null) {
+      stack.push(top);
+      stack.push(top.right);
+    }
+  }
+  return res;
+};
+
 // build a huffman tree: https://www.geeksforgeeks.org/huffman-coding-greedy-algo-3/
 // takes: [ [String,Int] ], String; returns: String (with "0" and "1")
-function encode(freqs: [string, number][], s: string): string {}
+function encode(freqs: [string, number][], s: string): string {
+  const tree = createHuffmanTree(freqs);
+  const encoding = encodeChars(tree);
+  return s
+    .split("")
+    .map((char) => encoding[char])
+    .join("");
+}
 
 // takes [ [String, Int] ], String (with "0" and "1"); returns: String
 function decode(freqs: [string, number][], bits: string): string {}
