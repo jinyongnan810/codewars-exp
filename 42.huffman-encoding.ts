@@ -93,6 +93,7 @@ const encodeChars = (tree: HuffmanNode): { [char: string]: string } => {
 // build a huffman tree: https://www.geeksforgeeks.org/huffman-coding-greedy-algo-3/
 // takes: [ [String,Int] ], String; returns: String (with "0" and "1")
 function encode(freqs: [string, number][], s: string): string {
+  if (freqs.length <= 1) return null;
   const tree = createHuffmanTree(freqs);
   const encoding = encodeChars(tree);
   return s
@@ -102,4 +103,24 @@ function encode(freqs: [string, number][], s: string): string {
 }
 
 // takes [ [String, Int] ], String (with "0" and "1"); returns: String
-function decode(freqs: [string, number][], bits: string): string {}
+function decode(freqs: [string, number][], bits: string): string {
+  if (freqs.length <= 1) return null;
+  const tree = createHuffmanTree(freqs);
+  let res = "";
+  while (bits.length > 0) {
+    let node = tree;
+    for (let i = 0; i < bits.length; i++) {
+      if (bits[i] == "0") {
+        node = node.left!;
+      } else {
+        node = node.right!;
+      }
+      if (node.char) {
+        res += node.char;
+        bits = bits.slice(i + 1);
+        break;
+      }
+    }
+  }
+  return res;
+}
