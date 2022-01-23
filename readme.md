@@ -4,18 +4,36 @@
 
 - Loosen the mind & have fun.
 
-#### Day 32-40
-- create a huffman-tree
-![huffman-tree](https://user-images.githubusercontent.com/29720903/150036931-0e36753a-f4e4-4448-89fd-bbbf5b38de65.png)
+#### Day 32-44
 
+- From [38-43](https://github.com/jinyongnan810/codewars-exp/compare/e7a13f5a5e9c5cd5c29aa1d58fcc4d5122f25758...e283c11fda9dc0a0a04c1c62866cfc482f26f0b5)
+- create a huffman-tree
+  ![huffman-tree](https://user-images.githubusercontent.com/29720903/150036931-0e36753a-f4e4-4448-89fd-bbbf5b38de65.png)
+
+- mix and match
+
+```ts
+const getAllPairs = (arr: string[][]): string[] => {
+  if (arr.length > 1) {
+    const rest = getAllPairs(arr.slice(1));
+    const cur = arr[0];
+    const res: string[] = [];
+    for (let i = 0; i < cur.length; i++) {
+      rest.forEach((r) => res.push(cur[i] + r));
+    }
+    return res;
+  }
+  return arr[0];
+};
+```
 
 ---
 
 #### Day 32-33
+
 - [Binary divide by 5](https://github.com/jinyongnan810/codewars-exp/blob/master/37.divide-by-5.ts)
 - convert nfa to regex
-![nfa-to-regex](https://user-images.githubusercontent.com/29720903/149097813-28831afb-9578-4f1a-80a3-6bea4ff47d2a.png)
-
+  ![nfa-to-regex](https://user-images.githubusercontent.com/29720903/149097813-28831afb-9578-4f1a-80a3-6bea4ff47d2a.png)
 
 #### Day 24-31
 
