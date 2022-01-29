@@ -23,6 +23,9 @@ function longestSlideDown(pyramid: number[][]) {
           pyrimidNodes[i][j].possibles.push(x + pyrimidNodes[i][j].value)
         );
     }
+    // remove unneeded rows
+    i--;
+    pyrimidNodes.shift();
   }
   return pyrimidNodes[pyrimidNodes.length - 1].reduce((prev, cur) => {
     const largest = cur.possibles.reduce((p, c) => (c > p ? c : p), 0);
