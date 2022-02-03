@@ -4,9 +4,54 @@
 
 - Loosen the mind & have fun.
 
+#### Day 45-54
+
+- No [41-51](https://github.com/jinyongnan810/codewars-exp/compare/6d92bb6e642ba51aa37c54c739796feb2d44dec8...1c3364a8065494c676b87de2ab1050dcfda88852)
+- Multiply large numbers
+
+```ts
+const multiply = (x: string, y: string): string => {
+  let res = "0";
+  for (let i = y.length - 1; i >= 0; i--) {
+    const m = multiply1Digit(x, y[i]);
+    const zeros = y.length - 1 - i;
+    res = sum(res, m + (zeros > 0 ? "0".repeat(zeros) : ""));
+  }
+  return res;
+};
+const multiply1Digit = (x: string, y: string): string => {
+  const yNum = +y;
+  const stack: number[] = [];
+  let prevOverflow = 0;
+  for (let i = x.length - 1; i >= 0; i--) {
+    const m = +x[i] * yNum + prevOverflow;
+    stack.push(m % 10);
+    prevOverflow = Math.floor(m / 10);
+  }
+  if (prevOverflow != 0) stack.push(prevOverflow);
+  return stack.reverse().join("");
+};
+const sum = (a: string, b: string): string => {
+  if (a.length > b.length) b = b.padStart(a.length, "0");
+  else a = a.padStart(b.length, "0");
+  let plus1 = 0;
+  const stack = [];
+  for (let i = a.length - 1; i >= 0; i--) {
+    const sum = +a[i] + +b[i] + plus1;
+    if (sum > 9) plus1 = 1;
+    else plus1 = 0;
+    stack.push((sum % 10).toString());
+  }
+  if (plus1 == 1) stack.push("1");
+  return stack.reverse().join("");
+};
+```
+
+---
+
 #### Day 32-44
 
-- From [38-43](https://github.com/jinyongnan810/codewars-exp/compare/e7a13f5a5e9c5cd5c29aa1d58fcc4d5122f25758...e283c11fda9dc0a0a04c1c62866cfc482f26f0b5)
+- No [38-43](https://github.com/jinyongnan810/codewars-exp/compare/e7a13f5a5e9c5cd5c29aa1d58fcc4d5122f25758...e283c11fda9dc0a0a04c1c62866cfc482f26f0b5)
 - create a huffman-tree
   ![huffman-tree](https://user-images.githubusercontent.com/29720903/150036931-0e36753a-f4e4-4448-89fd-bbbf5b38de65.png)
 
@@ -37,7 +82,7 @@ const getAllPairs = (arr: string[][]): string[] => {
 
 #### Day 24-31
 
-- From [29-36](https://github.com/jinyongnan810/codewars-exp/compare/38095907341c16f98523a1ceee2d46e5cb9387b7...6cbce97cfdb497bb72669960be8265b9c84be2e6)
+- No [29-36](https://github.com/jinyongnan810/codewars-exp/compare/38095907341c16f98523a1ceee2d46e5cb9387b7...6cbce97cfdb497bb72669960be8265b9c84be2e6)
 - Whiteboard drawing really helps.
 - When compare string
 
@@ -58,7 +103,7 @@ a.localeCompare(b);
 
 #### Day 18-23
 
-- From [22-28](https://github.com/jinyongnan810/codewars-exp/compare/16f2446ba5c6fd02908de5937976271f44983fe1...550707142dea809ff21371396d3ed6ca2858a164)
+- No [22-28](https://github.com/jinyongnan810/codewars-exp/compare/16f2446ba5c6fd02908de5937976271f44983fe1...550707142dea809ff21371396d3ed6ca2858a164)
 - Check a number is xxxxx
 
 ```ts
@@ -125,7 +170,7 @@ const shuffle = (first: string, rest: string): string[] => {
 
 #### Day 12-17
 
-- From [16-21](https://github.com/jinyongnan810/codewars-exp/compare/a1c988456145e72de5972a4a7136fb3fb401b265...a8abc5d058ac3b4e68060f98052cd91275d76a75)
+- No [16-21](https://github.com/jinyongnan810/codewars-exp/compare/a1c988456145e72de5972a4a7136fb3fb401b265...a8abc5d058ac3b4e68060f98052cd91275d76a75)
 - To make something like `sum(1)(2)...(n)`
   - If the length is fixed, we can consider using the [currying](https://javascript.info/currying-partials)
   - Else we can use `valueOf` of the function
@@ -142,7 +187,7 @@ export function add(x: number): any {
 
 #### Day 5-11
 
-- From [7-15](https://github.com/jinyongnan810/codewars-exp/compare/e90f59fbb72bd6e20c099696c4bd8f37fd571dec...b170724ba4d949cad5efc2586ca65a8fea846cfa)
+- No [7-15](https://github.com/jinyongnan810/codewars-exp/compare/e90f59fbb72bd6e20c099696c4bd8f37fd571dec...b170724ba4d949cad5efc2586ca65a8fea846cfa)
 - Regex replace
 
 ```ts
@@ -164,7 +209,7 @@ a.replace(/(\w)(\w+)*/g, "$2$1ay");
 
 #### Day 1-4
 
-- From [1~6](https://github.com/jinyongnan810/codewars-exp/compare/e8ce074fb2b0b071af9b2e1ee3987688fda2e675...0d5761b3f9549fe72bde9f800807b8d20dd2951a)
+- No [1~6](https://github.com/jinyongnan810/codewars-exp/compare/e8ce074fb2b0b071af9b2e1ee3987688fda2e675...0d5761b3f9549fe72bde9f800807b8d20dd2951a)
 - Get the list of the numbers below specified
 
 ```ts
