@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 1000px;
+  height: 1000px;
+  margin: 20px auto;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  width: 100%;
+}
+.block {
+  background-color: #fff;
+  height: 100%;
+  flex: 1;
+}
+.snake {
+  background-color: red;
+  height: 100%;
+  flex: 1;
+}
