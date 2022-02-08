@@ -12,28 +12,31 @@ export function chooseBestSum(
   const allMatches = pickKItems(k, ls);
   let biggest = 0;
   for (let i = 0; i < allMatches.length; i++) {
-    const sum = allMatches[i].reduce((p, c) => p + c, 0);
+    const sum = allMatches[i];
     if (sum == t) return t;
     if (sum > biggest && sum < t) biggest = sum;
   }
   console.log(`hit cache:${hitCache}`);
   return biggest == 0 ? null : biggest;
 }
-let cache: { [key: string]: number[][] } = {};
+let cache: { [key: string]: number[] } = {};
 let hitCache = 0;
-const pickKItems = (k: number, list: number[]): number[][] => {
-  if (k == list.length) return [list];
-  if (k == 1) return list.map((x) => [x]);
+const pickKItems = (k: number, list: number[]): number[] => {
+  if (k == list.length) return [list.reduce((p, c) => p + c, 0)];
+  if (k == 1) return list;
   if (cache[`${k}-${JSON.stringify(list)}`]) {
     hitCache++;
     return cache[`${k}-${JSON.stringify(list)}`];
   }
-  const res: number[][] = [];
+  let res: number[] = [];
   list.forEach((item, i) => {
     const restOfList = [...list.slice(0, i), ...list.slice(i + 1, list.length)];
     const pickKMinus1FromRest = pickKItems(k - 1, restOfList);
-    pickKMinus1FromRest.map((x) => [item, ...x]).forEach((x) => res.push(x));
+    [...new Set(pickKMinus1FromRest.map((x) => x + item))].forEach((x) =>
+      res.push(x)
+    );
   });
+  res = [...new Set(res)];
   cache[`${k}-${JSON.stringify(list)}`] = res;
   return res;
 };
