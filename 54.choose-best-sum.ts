@@ -30,7 +30,7 @@ const pickKItems = (k: number, list: number[]): number[] => {
   }
   let res: number[] = [];
   list.forEach((item, i) => {
-    const restOfList = [...list.slice(0, i), ...list.slice(i + 1, list.length)];
+    const restOfList = list.slice(i + 1, list.length);
     const pickKMinus1FromRest = pickKItems(k - 1, restOfList);
     [...new Set(pickKMinus1FromRest.map((x) => x + item))].forEach((x) =>
       res.push(x)
@@ -39,4 +39,13 @@ const pickKItems = (k: number, list: number[]): number[] => {
   res = [...new Set(res)];
   cache[`${k}-${JSON.stringify(list)}`] = res;
   return res;
+};
+
+const pickKItems_others = (k: number, list: number[]): number[][] => {
+  const res: number[][] = [];
+  const max = 1 << list.length;
+  for (let i = 1; i < max; i++) {
+    res.push(list.filter((_, index) => (i >> index) & 1));
+  }
+  return res.filter((x) => x.length == k);
 };
