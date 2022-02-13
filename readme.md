@@ -4,9 +4,42 @@
 
 - Loosen the mind & have fun.
 
+---
+
+#### Day 55-63
+
+- No. [52-57](https://github.com/jinyongnan810/codewars-exp/compare/b012a4e19af37dc07060664d53c27d8cbc3c7681...d1d37fd54b2125c2daf401727e335e4d3d242d15)
+- Pick k items form list
+
+```ts
+const pickKItems = (k: number, list: number[]): number[][] => {
+  if (k == list.length) return [list];
+  if (k == 1) return list.map((x) => [x]);
+  let res: number[][] = [];
+  list.forEach((item, i) => {
+    const restOfList = list.slice(i + 1, list.length);
+    const pickKMinus1FromRest = pickKItems(k - 1, restOfList);
+    pickKMinus1FromRest.forEach((l) => res.push([...l, item]));
+  });
+  return res;
+};
+
+// faster than above
+const pickKItems_binary = (k: number, list: number[]): number[][] => {
+  const res: number[][] = [];
+  const max = 1 << list.length;
+  for (let i = 1; i < max; i++) {
+    res.push(list.filter((_, index) => (i >> index) & 1));
+  }
+  return res.filter((x) => x.length == k);
+};
+```
+
+---
+
 #### Day 45-54
 
-- No [41-51](https://github.com/jinyongnan810/codewars-exp/compare/6d92bb6e642ba51aa37c54c739796feb2d44dec8...1c3364a8065494c676b87de2ab1050dcfda88852)
+- No. [41-51](https://github.com/jinyongnan810/codewars-exp/compare/6d92bb6e642ba51aa37c54c739796feb2d44dec8...1c3364a8065494c676b87de2ab1050dcfda88852)
 - Multiply large numbers
 
 ```ts
