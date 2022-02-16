@@ -17,3 +17,32 @@ const countChange = function (money: number, coins: number[]): number {
   return res;
 };
 // console.log(JSON.stringify(countChange(10, [5,2,3])))
+
+const countChangeVariation = function (
+  money: number,
+  coins: number[]
+): string[] {
+  if (coins.every((c) => c > money)) return [];
+  if (coins.length == 1)
+    return money % coins[0] == 0 ? [`${coins[0]}*${money / coins[0]}`] : [];
+  const coinsSorted = coins.sort((a, b) => b - a);
+  const firstCoin = coinsSorted[0];
+  const maxFirstCoin = Math.floor(money / firstCoin);
+  let res: string[] = [];
+
+  if (maxFirstCoin == money / firstCoin)
+    res.push(`${firstCoin}*${maxFirstCoin}`);
+  for (let i = maxFirstCoin; i >= 0; i--) {
+    const subres = countChangeVariation(
+      money - i * firstCoin,
+      coinsSorted.slice(1)
+    );
+    subres.forEach((r) => {
+      res.push(i > 0 ? `${firstCoin}*${i}, ${r}` : `${r}`);
+    });
+    // console.log(`firstCoin:${firstCoin},i=${i},money=${money - i * firstCoin},subres=${subres}`)
+  }
+
+  return res;
+};
+console.log(JSON.stringify(countChangeVariation(10, [5, 2, 3])));
