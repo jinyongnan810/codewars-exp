@@ -1,6 +1,6 @@
 // https://www.codewars.com/kata/584dee06fe9c9aef810001e8/train/javascript
 // "1","5","6","25","76","376","625","9376","90625","109376","890625","2890625","7109376"
-const greenCache: BigInt[] = [1n, 5n, 6n];
+const greenCache: string[] = ["1", "5", "6"];
 
 // @ts-ignore
 const multiply = (x: string, y: string): string => {
@@ -43,43 +43,49 @@ const sum = (a: string, b: string): string => {
 
 function green(n: number): BigInt {
   if (n <= greenCache.length) {
-    return greenCache[n - 1];
+    return BigInt(greenCache[n - 1]);
   }
   for (let i = greenCache.length; i < n; ) {
-    const prev1 = greenCache[i - 1].toString();
-    const prev2 = greenCache[i - 2].toString();
-    const prev3 = greenCache[i - 3].toString();
+    const prev1 = greenCache[i - 1];
+    const prev2 = greenCache[i - 2];
+    const prev3 = greenCache[i - 3];
     const ptn1 = prev1;
     const ptn2 = prev1.endsWith(prev2) ? prev3 : prev2;
     const l1 = ptn1.length;
     // console.log(`i=${i}`);
     // console.log(`cache:${greenCache}`);
-    const hit: BigInt[] = [];
+    const hit: string[] = [];
     for (let x = 1; x <= 9; x++) {
       const nextTry = sum(ptn1, `${x}${"0".repeat(l1)}`);
       const m = multiply(nextTry, nextTry);
       // console.log(`trying2:${nextTry}`);
       if (m.endsWith(nextTry)) {
         // console.log(`pushed:${nextTry}`);
-        hit.push(BigInt(nextTry));
+        hit.push(nextTry);
         i++;
         break;
       }
     }
     for (let x = 1; x <= 9; x++) {
-      const nextTry = sum(ptn2.toString(), `${x}${"0".repeat(l1)}`);
+      const nextTry = sum(ptn2, `${x}${"0".repeat(l1)}`);
       // console.log(`trying1:${nextTry}`);
       const m = multiply(nextTry, nextTry);
       if (m.endsWith(nextTry)) {
         // console.log(`pushed:${nextTry}`);
-        hit.push(BigInt(nextTry));
+        hit.push(nextTry);
         i++;
         break;
       }
     }
-    hit.sort().forEach((x) => greenCache.push(x));
+    hit
+      .sort((a, b) => {
+        if (a.length > b.length) return 1;
+        else if (a.length < b.length) return -1;
+        else return BigInt(a) > BigInt(b) ? 1 : -1;
+      })
+      .forEach((x) => greenCache.push(x));
   }
-  return greenCache[n - 1];
+  return BigInt(greenCache[n - 1]);
 }
 
-console.log(green(50));
+console.log(green(30));
