@@ -96,10 +96,19 @@ function green(n: number): BigInt {
   }
   for (let i = greenCache.length; i < n; ) {
     const prev1 = greenCache[i - 1];
-    const prev2 = greenCache[i - 2];
-    const prev3 = greenCache[i - 3];
     const ptn1 = prev1;
-    const ptn2 = prev1.endsWith(prev2) ? prev3 : prev2;
+    let ptn2 = "";
+    // console.log(JSON.stringify(greenCache));
+    for (let x = i - 2; x >= 1; x--) {
+      // console.log(
+      //   `prev1:${prev1},x:${x},i:${i},greenCache[x]:${greenCache[x]}`
+      // );
+      if (!prev1.endsWith(greenCache[x])) {
+        ptn2 = greenCache[x];
+        break;
+      }
+    }
+    // console.log(`prev1:${prev1},ptn2:${ptn2}`);
     const l1 = ptn1.length;
     // console.log(`i=${i}`);
     // console.log(`cache:${greenCache}`);
@@ -137,4 +146,4 @@ function green(n: number): BigInt {
   return BigInt(greenCache[n - 1]);
 }
 
-console.log(green(47));
+// console.log(green(100));
