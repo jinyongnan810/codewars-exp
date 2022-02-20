@@ -55,18 +55,18 @@ const greenCache: string[] = ["1", "5", "6"];
 const multiply_60 = (x: string, y: string): string => {
   let res = "0";
   for (let i = y.length - 1; i >= 0; i--) {
-    const m = multiply1Digit_60(x, y[i]);
+    const m = multiply1Digit_60(x, y[i], i);
     const zeros = y.length - 1 - i;
     res = sum_60(res, m + (zeros > 0 ? "0".repeat(zeros) : ""));
   }
   return res;
 };
 // @ts-ignore
-const multiply1Digit_60 = (x: string, y: string): string => {
+const multiply1Digit_60 = (x: string, y: string, neededDigits): string => {
   const yNum = +y;
   const stack: number[] = [];
   let prevOverflow = 0;
-  for (let i = x.length - 1; i >= 0; i--) {
+  for (let i = x.length - 1; i >= x.length - 1 - neededDigits; i--) {
     const m = +x[i] * yNum + prevOverflow;
     stack.push(m % 10);
     prevOverflow = Math.floor(m / 10);
