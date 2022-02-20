@@ -52,17 +52,17 @@ const greenCache: string[] = ["1", "5", "6"];
 // ];
 
 // @ts-ignore
-const multiply = (x: string, y: string): string => {
+const multiply_60 = (x: string, y: string): string => {
   let res = "0";
   for (let i = y.length - 1; i >= 0; i--) {
-    const m = multiply1Digit(x, y[i]);
+    const m = multiply1Digit_60(x, y[i]);
     const zeros = y.length - 1 - i;
-    res = sum(res, m + (zeros > 0 ? "0".repeat(zeros) : ""));
+    res = sum_60(res, m + (zeros > 0 ? "0".repeat(zeros) : ""));
   }
   return res;
 };
 // @ts-ignore
-const multiply1Digit = (x: string, y: string): string => {
+const multiply1Digit_60 = (x: string, y: string): string => {
   const yNum = +y;
   const stack: number[] = [];
   let prevOverflow = 0;
@@ -75,7 +75,7 @@ const multiply1Digit = (x: string, y: string): string => {
   return stack.reverse().join("");
 };
 // @ts-ignore
-const sum = (a: string, b: string): string => {
+const sum_60 = (a: string, b: string): string => {
   if (a.length > b.length) b = b.padStart(a.length, "0");
   else a = a.padStart(b.length, "0");
   let plus1 = 0;
@@ -114,8 +114,8 @@ function green(n: number): BigInt {
     // console.log(`cache:${greenCache}`);
     const hit: string[] = [];
     for (let x = 1; x <= 9; x++) {
-      const nextTry = sum(ptn1, `${x}${"0".repeat(l1)}`);
-      const m = multiply(nextTry, nextTry);
+      const nextTry = sum_60(ptn1, `${x}${"0".repeat(l1)}`);
+      const m = multiply_60(nextTry, nextTry);
       // console.log(`trying2:${nextTry}`);
       if (m.endsWith(nextTry)) {
         // console.log(`pushed:${nextTry}`);
@@ -125,9 +125,9 @@ function green(n: number): BigInt {
       }
     }
     for (let x = 1; x <= 9; x++) {
-      const nextTry = sum(ptn2, `${x}${"0".repeat(l1)}`);
+      const nextTry = sum_60(ptn2, `${x}${"0".repeat(l1)}`);
       // console.log(`trying1:${nextTry}`);
-      const m = multiply(nextTry, nextTry);
+      const m = multiply_60(nextTry, nextTry);
       if (m.endsWith(nextTry)) {
         // console.log(`pushed:${nextTry}`);
         hit.push(nextTry);
