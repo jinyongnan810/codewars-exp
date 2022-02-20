@@ -145,5 +145,7 @@ function green(n: number): BigInt {
   }
   return BigInt(greenCache[n - 1]);
 }
-
-// console.log(green(100));
+// 500: 6s, 1000:33s
+console.log(Date.now());
+console.log(green(1000));
+console.log(Date.now());
