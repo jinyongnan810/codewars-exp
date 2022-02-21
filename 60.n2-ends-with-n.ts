@@ -1,4 +1,5 @@
 // https://www.codewars.com/kata/584dee06fe9c9aef810001e8/train/javascript
+// https://www.codewars.com/kata/584dee06fe9c9aef810001e8/solutions/javascript
 // "1","5","6","25","76","376","625","9376","90625","109376","890625","2890625","7109376"
 const greenCache: bigint[] = [1n, 5n, 6n];
 // const greenCache: string[] = [
@@ -65,7 +66,11 @@ function green(n: number): BigInt {
       // console.log(
       //   `prev1:${prev1},x:${x},i:${i},greenCache[x]:${greenCache[x]}`
       // );
-      if (!prev1.toString().endsWith(greenCache[x].toString())) {
+      if (
+        (prev1 - greenCache[x]) %
+          BigInt(`1${"0".repeat(greenCache[x].toString().length)}`) !=
+        0n
+      ) {
         ptn2 = greenCache[x];
         break;
       }
@@ -77,8 +82,8 @@ function green(n: number): BigInt {
     for (let x = 1; x <= 9; x++) {
       const zeros: bigint = BigInt(`${x}${"0".repeat(l1)}`);
       const nextTry: bigint = ptn1 + zeros;
-      const m = (nextTry ** 2n).toString();
-      if (m.endsWith(nextTry.toString())) {
+      const m = nextTry ** 2n;
+      if ((m - nextTry) % BigInt(`1${"0".repeat(l1 + 1)}`) == 0n) {
         hit.push(nextTry);
         i++;
         break;
@@ -87,8 +92,8 @@ function green(n: number): BigInt {
     for (let x = 1; x <= 9; x++) {
       const zeros: bigint = BigInt(`${x}${"0".repeat(l1)}`);
       const nextTry: bigint = ptn2 + zeros;
-      const m = (nextTry ** 2n).toString();
-      if (m.endsWith(nextTry.toString())) {
+      const m = nextTry ** 2n;
+      if ((m - nextTry) % BigInt(`1${"0".repeat(l1 + 1)}`) == 0n) {
         hit.push(nextTry);
         i++;
         break;
