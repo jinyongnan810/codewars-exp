@@ -6,6 +6,18 @@
 
 ---
 
+#### Day 64-74
+
+- No. [58-63](https://github.com/jinyongnan810/codewars-exp/compare/d374e3faefd9ed735ed91428b0bd260a978ad8c4...456f21fbefc672576da16b3134d381f43af30c87)
+- dart divide&get floor
+
+```dart
+a~/b
+a~/=b
+```
+
+---
+
 #### Day 55-63
 
 - No. [52-57](https://github.com/jinyongnan810/codewars-exp/compare/b012a4e19af37dc07060664d53c27d8cbc3c7681...d1d37fd54b2125c2daf401727e335e4d3d242d15)
