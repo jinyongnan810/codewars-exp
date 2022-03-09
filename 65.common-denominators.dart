@@ -1,55 +1,61 @@
 // https://www.codewars.com/kata/54d7660d2daf68c619000d95/train/dart
+import 'dart:math';
+
+List<int> primes = [2, 3];
+bool checkIsPrime(int n) {
+  if (n < primes.last) {
+    return primes.contains(n);
+  }
+  int s = sqrt(n).floor();
+  for (int i = 2; i < s; i++) {
+    if (n % i == 0) return false;
+  }
+  primes.add(n);
+  return true;
+}
+
+int getGreatestCommonDivisor(List<int> list) {
+  final maxSqrt = list.fold<int>(0, (previousValue, element) {
+    int s = sqrt(element).floor();
+    return previousValue < s ? s : previousValue;
+  });
+  List<int> cd = [];
+  for (int i = 2; i <= maxSqrt; i++) {
+    if (!checkIsPrime(i)) continue;
+    while (list.every((element) => element % i == 0)) {
+      cd.add(i);
+      list = list.map((e) => (e / i).floor()).toList();
+    }
+  }
+  return cd.fold(1, (previousValue, element) => previousValue * element);
+}
+
 String convertFrac(List<List<int>> list) {
   // simplify the fractions
-  final sList = list.map((l) {
-    final a = l[0];
-    final b = l[1];
-
-    if (a != 1 && b % a == 0) {
-      int f = (b / a).floor();
-      return [(a / f).floor(), (b / f).floor()];
-    }
+  List<List<int>> sList = list.map((l) {
+    int gcd = getGreatestCommonDivisor(l);
+    int a = l[0] ~/ gcd;
+    int b = l[1] ~/ gcd;
     return [a, b];
   }).toList();
   print(sList);
-  // find denominator
-  Set<int> set = {};
-  sList.forEach((l) {
-    set.add(l[1]);
-  });
-  List<int> denoms = set.toList();
-  denoms.sort();
-  denoms = denoms.where((d) {
-    for (int i = 0; i < denoms.length; i++) {
-      if (denoms[i] <= d) continue;
-      if (denoms[i] % d == 0) return false;
-    }
-    return true;
-  }).toList();
-  print(denoms);
-  final denominator = denoms.fold<int>(1, (previousValue, element) {
-    int a = previousValue > element ? previousValue : element;
-    int b = previousValue > element ? element : previousValue;
-    if (a % b == 0) return a;
-    return a * b;
-  });
-  print(denominator);
-  // apply denominator
-  final aList = sList.map((l) {
-    final a = l[0];
-    final b = l[1];
-    int s = (denominator / b).floor();
-    return [a * s, b * s];
-  });
-  print(aList);
-  // result
-  final res = aList.map((l) {
-    final a = l[0];
-    final b = l[1];
-    return '($a,$b)';
-  }).join('');
+  // get min common multiple
+  List<int> bs = sList.map((e) => e[1]).toList();
+  int gcd = getGreatestCommonDivisor(bs);
+  bs = bs.map((e) => e ~/ gcd).toList();
+  final minCommonMultiple =
+      bs.fold<int>(1, (previousValue, element) => previousValue * element) *
+          gcd;
+  print(gcd);
+  print(bs);
 
-  return res;
+  // result
+  return sList.map((l) {
+    final a = l[0];
+    final b = l[1];
+    int f = minCommonMultiple ~/ b;
+    return '(${a * f},$minCommonMultiple)';
+  }).join('');
 }
 
 main() {
