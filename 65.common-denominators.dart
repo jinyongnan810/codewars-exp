@@ -40,12 +40,12 @@ bool checkIsPrime(int n) {
 }
 
 int getGreatestCommonDivisor(List<int> list) {
-  final maxSqrt = list.fold<int>(0, (previousValue, element) {
-    int s = sqrt(element).floor();
+  final max = list.fold<int>(0, (previousValue, element) {
+    int s = element;
     return previousValue < s ? s : previousValue;
   });
   List<int> cd = [];
-  for (int i = 2; i <= maxSqrt; i++) {
+  for (int i = 2; i <= max; i++) {
     if (!checkIsPrime(i)) continue;
     while (list.every((element) => element % i == 0)) {
       cd.add(i);
@@ -99,8 +99,9 @@ String convertFrac(List<List<int>> list) {
 
 main() {
   print(convertFrac([
-    [69, 130],
-    [87, 1310],
-    [3, 4]
+    [2, 2],
+    [3, 1],
+    [4, 1],
+    [5, 1]
   ]));
 }
