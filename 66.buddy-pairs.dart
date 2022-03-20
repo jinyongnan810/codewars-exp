@@ -7,8 +7,9 @@ List<int> primes = [2, 3];
 
 Map<int, int> primeDecomposition(int n) {
   // get all the primes
-  if (n > primes.last) {
-    for (int i = primes.last + 1; i <= n; i++) {
+  int halfn = (n / 2).floor();
+  if (halfn > primes.last) {
+    for (int i = primes.last + 1; i <= halfn; i++) {
       checkIsPrime(i);
     }
   }
@@ -20,10 +21,7 @@ Map<int, int> primeDecomposition(int n) {
     if (prime > nTmp) break;
     while (nTmp % prime == 0) {
       nTmp ~/= prime;
-      if (res[prime] != null)
-        res[prime] = (res[prime] ?? 0) + 1;
-      else
-        res[prime] = 1;
+      res[prime] = (res[prime] ?? 0) + 1;
     }
   }
   return res;
@@ -113,13 +111,16 @@ main() {
   // print(buddy(57345, 90061));
   // print(buddy(2177, 4357));
   // print(buddy(1071625, 1103735));
-  // print(primeDecomposition(1081184));
+  print(primeDecomposition(62744));
+  print(sumOfDividers_v2(62744));
+  print(primeDecomposition(75495));
+  print(sumOfDividers_v2(75495));
   // print(sumOfDividersCache.keys.length);
   // print(buddyCache.keys.length);
   // print(buddyCache[62744]);
-  print(DateTime.now());
-  for (int i = 1081184; i < 1082184; i++) sumOfDividers(i);
-  print(DateTime.now());
-  for (int i = 1081184; i < 1082184; i++) sumOfDividers_v2(i);
-  print(DateTime.now());
+  // print(DateTime.now()); // 2022-03-20 09:57:17.781338
+  // for (int i = 1081184; i < 1082184; i++) sumOfDividers(i);
+  // print(DateTime.now()); // 2022-03-20 09:57:20.452079
+  // for (int i = 1081184; i < 1082184; i++) sumOfDividers_v2(i);
+  // print(DateTime.now()); // 2022-03-20 09:57:20.757949
 }
