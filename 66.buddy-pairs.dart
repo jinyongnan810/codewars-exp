@@ -6,33 +6,28 @@ Map<int, List<int>?> buddyCache = {};
 List<int> primes = [2, 3];
 
 Map<int, int> primeDecomposition(int n) {
-  // get all the primes
-  int halfn = (n / 2).floor();
-  if (halfn > primes.last) {
-    for (int i = primes.last + 1; i <= halfn; i++) {
-      checkIsPrime(i);
-    }
-  }
   // get decompositions
   int nTmp = n;
   Map<int, int> res = {};
   for (int i = 0; i < primes.length; i++) {
     int prime = primes[i];
-    if (prime > nTmp) break;
     while (nTmp % prime == 0) {
       nTmp ~/= prime;
       res[prime] = (res[prime] ?? 0) + 1;
+      if (nTmp != 1 && checkIsPrime(nTmp)) {
+        res[nTmp] = (res[nTmp] ?? 0) + 1;
+        if (!primes.contains(nTmp)) primes.add(nTmp);
+        return res;
+      }
     }
   }
   return res;
 }
 
 bool checkIsPrime(int n) {
-  if (n < primes.last) {
-    return primes.contains(n);
-  }
+  if (primes.contains(n)) return true;
   int s = sqrt(n).floor();
-  for (int i = 2; i < s; i++) {
+  for (int i = 2; i <= s; i++) {
     if (n % i == 0) return false;
   }
   primes.add(n);
@@ -41,12 +36,18 @@ bool checkIsPrime(int n) {
 
 List<int>? buddy(int start, int limit) {
   print('$start-$limit');
+  // get all the primes
+  int s = sqrt(limit).floor();
+  for (int i = 3; i <= s; i++) {
+    checkIsPrime(i);
+  }
   for (int i = start; i <= limit; i++) {
     if (buddyCache.containsKey(i)) {
       if (buddyCache[i] == null) continue;
       return buddyCache[i];
     }
     int sum = sumOfDividers_v2(i);
+    if (sum == 0) continue;
     if (sum - 1 < i) {
       buddyCache[i] = null;
       continue;
@@ -74,6 +75,7 @@ int sumOfDividers(int n) {
 int sumOfDividers_v2(int n) {
   if (sumOfDividersCache.containsKey(n)) return sumOfDividersCache[n]!;
   final primeDecs = primeDecomposition(n);
+  // print(primeDecs);
   List<int> primeDecsFlat = [];
   primeDecs.entries.forEach((entry) {
     for (int i = 0; i < entry.value; i++) {
@@ -104,17 +106,19 @@ int sumOfDividers_v2(int n) {
 }
 
 main() {
-  // print(buddy(10, 50));
-  // print(buddy(200, 1000));
+  print(buddy(10, 50));
+  print(buddy(200, 1000));
+  print(buddy(57345, 90061));
   // print(buddy(57345, 90061));
   // print(buddy(57345, 90061));
-  // print(buddy(57345, 90061));
-  // print(buddy(2177, 4357));
+  print(buddy(310, 2755));
+  // print(primes);
   // print(buddy(1071625, 1103735));
-  print(primeDecomposition(62744));
-  print(sumOfDividers_v2(62744));
-  print(primeDecomposition(75495));
-  print(sumOfDividers_v2(75495));
+  // print(primeDecomposition(62744));
+  // print(primeDecomposition(62744));
+  // print(sumOfDividers_v2(62744));
+  // print(primeDecomposition(9209));
+  // print(sumOfDividers_v2(9209));
   // print(sumOfDividersCache.keys.length);
   // print(buddyCache.keys.length);
   // print(buddyCache[62744]);
