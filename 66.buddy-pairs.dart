@@ -12,6 +12,7 @@ Map<int, int> primeDecomposition(int n) {
   for (int i = 0; i < primes.length; i++) {
     int prime = primes[i];
     while (nTmp % prime == 0) {
+      if (prime > nTmp) continue;
       nTmp ~/= prime;
       res[prime] = (res[prime] ?? 0) + 1;
       if (nTmp != 1 && checkIsPrime(nTmp)) {
