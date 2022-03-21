@@ -110,6 +110,24 @@ int sumOfDividers_v2(int n) {
   return sum;
 }
 
+List<int>? buddy_others(int start, int limit) {
+  for (int n = start; n <= limit; n++) {
+    int m = sumDivisors_others(n);
+    if (m > n && sumDivisors_others(m) == n) return [n, m];
+  }
+  return null;
+}
+
+int sumDivisors_others(int n) {
+  int sum = 0;
+  for (int i = 2; i < n / i; i++) {
+    if (n % i == 0) {
+      sum += i + n ~/ i;
+    }
+  }
+  return sum;
+}
+
 main() {
   print(buddy(10, 50));
   print(buddy(200, 1000));
