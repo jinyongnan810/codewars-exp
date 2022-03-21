@@ -4,6 +4,7 @@ import 'dart:math';
 Map<int, int> sumOfDividersCache = {};
 Map<int, List<int>?> buddyCache = {};
 List<int> primes = [2, 3];
+int maxPrimeChecked = 0;
 
 Map<int, int> primeDecomposition(int n) {
   // get decompositions
@@ -38,9 +39,12 @@ bool checkIsPrime(int n) {
 List<int>? buddy(int start, int limit) {
   print('$start-$limit');
   // get all the primes
-  int s = sqrt(limit).floor();
-  for (int i = 3; i <= s; i++) {
-    checkIsPrime(i);
+  if (limit > maxPrimeChecked) {
+    int s = sqrt(limit).floor();
+    for (int i = 3; i <= s; i++) {
+      checkIsPrime(i);
+    }
+    maxPrimeChecked = limit;
   }
   for (int i = start; i <= limit; i++) {
     if (buddyCache.containsKey(i)) {
