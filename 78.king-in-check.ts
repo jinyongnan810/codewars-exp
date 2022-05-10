@@ -8,7 +8,6 @@ const pawn = "♟";
 type Position = [number, number];
 
 function kingIsInCheck(chessboard: string[][]): boolean {
-  let controlledArea: Position[] = [];
   let kingPos: Position = [-1, -1];
   for (let i = 0; i < 8; i++) {
     for (let j = 0; j < 8; j++) {
@@ -19,24 +18,44 @@ function kingIsInCheck(chessboard: string[][]): boolean {
           kingPos = pos;
           break;
         }
+        default:
+          break;
+      }
+    }
+  }
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 8; j++) {
+      const pos: Position = [i, j];
+      const piece = chessboard[i][j];
+      switch (piece) {
         case queen: {
-          controlledArea = [...controlledArea, ...controlledByQueen(pos)];
+          const isChecked = checkedByQueen(pos, kingPos, chessboard);
+          console.log(`checked by queen:${isChecked}`);
+          if (isChecked) return true;
           break;
         }
         case bishop: {
-          controlledArea = [...controlledArea, ...controlledByBishop(pos)];
+          const isChecked = checkedByBishop(pos, kingPos, chessboard);
+          console.log(`checked by bishop:${isChecked}`);
+          if (isChecked) return true;
           break;
         }
         case knight: {
-          controlledArea = [...controlledArea, ...controlledByKnight(pos)];
+          const isChecked = checkedByKnight(pos, kingPos);
+          console.log(`checked by knight:${isChecked}`);
+          if (isChecked) return true;
           break;
         }
         case rook: {
-          controlledArea = [...controlledArea, ...controlledByRook(pos)];
+          const isChecked = checkedByRook(pos, kingPos, chessboard);
+          console.log(`checked by rook:${isChecked}`);
+          if (isChecked) return true;
           break;
         }
         case pawn: {
-          controlledArea = [...controlledArea, ...controlledByPawn(pos)];
+          const isChecked = checkedByPawn(pos, kingPos);
+          console.log(`checked by pawn:${isChecked}`);
+          if (isChecked) return true;
           break;
         }
         default:
@@ -44,145 +63,126 @@ function kingIsInCheck(chessboard: string[][]): boolean {
       }
     }
   }
-  if (
-    controlledArea.find((pos) => pos[0] == kingPos[0] && pos[1] == kingPos[1])
-  ) {
-    return true;
-  }
-  console.log(controlledArea);
-  console.log(kingPos);
   return false;
 }
 
-const controlledByQueen = (pos: Position): Position[] => {
-  const res: Position[] = [];
-  for (let i = 1; i < 8; i++) {
-    for (let j = 1; j < 8; j++) {
-      const posHorizontal: Position = [pos[0], (pos[1] + j) % 8];
-      const posVertical: Position = [(pos[0] + i) % 8, pos[1]];
-      res.push(posHorizontal);
-      res.push(posVertical);
-      console.log(`posHorizontal:${posHorizontal},posVertical:${posVertical}`);
-      if (i == j) {
-        if (pos[0] - i >= 0 && pos[1] + j < 8) {
-          const posTopRight: Position = [pos[0] - i, pos[1] + j];
-          res.push(posTopRight);
-          console.log(`posTopRight:${posTopRight}`);
-        }
-        if (pos[0] - i >= 0 && pos[1] - j >= 0) {
-          const posTopLeft: Position = [pos[0] - i, pos[1] - j];
-          res.push(posTopLeft);
-          console.log(`posTopLeft:${posTopLeft}`);
-        }
-        if (pos[0] + i < 8 && pos[1] + j < 8) {
-          const posBottomRight: Position = [pos[0] + i, pos[1] + j];
-          res.push(posBottomRight);
-          console.log(`posBottomRight:${posBottomRight}`);
-        }
-        if (pos[0] + i < 8 && pos[1] - j >= 0) {
-          const posBottomLeft: Position = [pos[0] + i, pos[1] - j];
-          res.push(posBottomLeft);
-          console.log(`posBottomLeft:${posBottomLeft}`);
-        }
-      }
+const checkedByQueen = (
+  pos: Position,
+  kingPos: Position,
+  chessboard: string[][]
+): boolean => {
+  const row = pos[0];
+  const col = pos[1];
+  const rowKing = kingPos[0];
+  const colKing = kingPos[1];
+  if (row == rowKing) {
+    // in the same row
+    const max = Math.max(col, colKing);
+    const min = Math.min(col, colKing);
+    for (let c = min + 1; c < max; c++) {
+      if (chessboard[row][c] != " ") return false;
     }
+    return true;
   }
-  return res;
+  if (col == colKing) {
+    // in the same column
+    const max = Math.max(row, rowKing);
+    const min = Math.min(row, rowKing);
+    for (let r = min + 1; r < max; r++) {
+      if (chessboard[r][col] != " ") return false;
+    }
+    return true;
+  }
+  if (Math.abs(row - rowKing) == Math.abs(col - colKing)) {
+    // in the cross line
+    const rowDir = row > rowKing ? -1 : 1;
+    const colDir = col > colKing ? -1 : 1;
+    const diff = Math.abs(row - rowKing);
+    for (let d = 1; d < diff; d++) {
+      if (chessboard[row + d * rowDir][col + d * colDir] != " ") return false;
+    }
+    return true;
+  }
+  return false;
 };
-const controlledByBishop = (pos: Position): Position[] => {
-  const res: Position[] = [];
-  for (let i = 1; i < 8; i++) {
-    if (pos[0] - i >= 0 && pos[1] + i < 8) {
-      const posTopRight: Position = [pos[0] - i, pos[1] + i];
-      res.push(posTopRight);
-      console.log(`posTopRight:${posTopRight}`);
+const checkedByBishop = (
+  pos: Position,
+  kingPos: Position,
+  chessboard: string[][]
+): boolean => {
+  const row = pos[0];
+  const col = pos[1];
+  const rowKing = kingPos[0];
+  const colKing = kingPos[1];
+  if (Math.abs(row - rowKing) == Math.abs(col - colKing)) {
+    // in the cross line
+    const rowDir = row > rowKing ? -1 : 1;
+    const colDir = col > colKing ? -1 : 1;
+    const diff = Math.abs(row - rowKing);
+    for (let d = 1; d < diff; d++) {
+      if (chessboard[row + d * rowDir][col + d * colDir] != " ") return false;
     }
-    if (pos[0] - i >= 0 && pos[1] - i >= 0) {
-      const posTopLeft: Position = [pos[0] - i, pos[1] - i];
-      res.push(posTopLeft);
-      console.log(`posTopLeft:${posTopLeft}`);
-    }
-    if (pos[0] + i < 8 && pos[1] + i < 8) {
-      const posBottomRight: Position = [pos[0] + i, pos[1] + i];
-      res.push(posBottomRight);
-      console.log(`posBottomRight:${posBottomRight}`);
-    }
-    if (pos[0] + i < 8 && pos[1] - i >= 0) {
-      const posBottomLeft: Position = [pos[0] + i, pos[1] - i];
-      res.push(posBottomLeft);
-      console.log(`posBottomLeft:${posBottomLeft}`);
-    }
+    return true;
   }
-  return res;
-};
-
-const controlledByKnight = (pos: Position): Position[] => {
-  const res: Position[] = [];
-  if (pos[0] - 2 >= 0 && pos[1] + 1 < 8) {
-    const posTopRight: Position = [pos[0] - 2, pos[1] + 1];
-    res.push(posTopRight);
-    console.log(`posTopRight:${posTopRight}`);
-  }
-  if (pos[0] - 1 >= 0 && pos[1] + 2 < 8) {
-    const posTopRight: Position = [pos[0] - 1, pos[1] + 2];
-    res.push(posTopRight);
-    console.log(`posTopRight:${posTopRight}`);
-  }
-  if (pos[0] - 2 >= 0 && pos[1] - 1 >= 0) {
-    const posTopLeft: Position = [pos[0] - 2, pos[1] - 1];
-    res.push(posTopLeft);
-    console.log(`posTopLeft:${posTopLeft}`);
-  }
-  if (pos[0] - 1 >= 0 && pos[1] - 2 >= 0) {
-    const posTopLeft: Position = [pos[0] - 1, pos[1] - 2];
-    res.push(posTopLeft);
-    console.log(`posTopLeft:${posTopLeft}`);
-  }
-  if (pos[0] + 2 < 8 && pos[1] + 1 < 8) {
-    const posBottomRight: Position = [pos[0] + 2, pos[1] + 1];
-    res.push(posBottomRight);
-    console.log(`posBottomRight:${posBottomRight}`);
-  }
-  if (pos[0] + 1 < 8 && pos[1] + 2 < 8) {
-    const posBottomRight: Position = [pos[0] + 1, pos[1] + 2];
-    res.push(posBottomRight);
-    console.log(`posBottomRight:${posBottomRight}`);
-  }
-  if (pos[0] + 2 < 8 && pos[1] - 1 >= 0) {
-    const posBottomLeft: Position = [pos[0] + 2, pos[1] - 1];
-    res.push(posBottomLeft);
-    console.log(`posBottomLeft:${posBottomLeft}`);
-  }
-  if (pos[0] + 1 < 8 && pos[1] - 2 >= 0) {
-    const posBottomLeft: Position = [pos[0] + 1, pos[1] - 2];
-    res.push(posBottomLeft);
-    console.log(`posBottomLeft:${posBottomLeft}`);
-  }
-  return res;
+  return false;
 };
 
-const controlledByRook = (pos: Position): Position[] => {
-  const res: Position[] = [];
-  for (let i = 1; i < 8; i++) {
-    for (let j = 1; j < 8; j++) {
-      const posHorizontal: Position = [pos[0], (pos[1] + j) % 8];
-      const posVertical: Position = [(pos[0] + i) % 8, pos[1]];
-      res.push(posHorizontal);
-      res.push(posVertical);
-      console.log(`posHorizontal:${posHorizontal},posVertical:${posVertical}`);
-    }
-  }
-  return res;
+const checkedByKnight = (pos: Position, kingPos: Position): boolean => {
+  const row = pos[0];
+  const col = pos[1];
+  const rowKing = kingPos[0];
+  const colKing = kingPos[1];
+  if (Math.abs(row - rowKing) == 1 && Math.abs(col - colKing) == 2) return true;
+  if (Math.abs(row - rowKing) == 2 && Math.abs(col - colKing) == 1) return true;
+  return false;
 };
-const controlledByPawn = (pos: Position): Position[] => {
-  const res: Position[] = [];
-  if (pos[0] + 1 < 8) {
-    if (pos[1] - 1 >= 0) {
-      res.push([pos[0] + 1, pos[1] - 1]);
+
+const checkedByRook = (
+  pos: Position,
+  kingPos: Position,
+  chessboard: string[][]
+): boolean => {
+  const row = pos[0];
+  const col = pos[1];
+  const rowKing = kingPos[0];
+  const colKing = kingPos[1];
+  if (row == rowKing) {
+    // in the same row
+    const max = Math.max(col, colKing);
+    const min = Math.min(col, colKing);
+    for (let c = min + 1; c < max; c++) {
+      if (chessboard[row][c] != " ") return false;
     }
-    if (pos[1] + 1 < 8) {
-      res.push([pos[0] + 1, pos[1] + 1]);
-    }
+    return true;
   }
-  return res;
+  if (col == colKing) {
+    // in the same column
+    const max = Math.max(row, rowKing);
+    const min = Math.min(row, rowKing);
+    for (let r = min + 1; r < max; r++) {
+      if (chessboard[r][col] != " ") return false;
+    }
+    return true;
+  }
+  return false;
 };
+const checkedByPawn = (pos: Position, kingPos: Position): boolean => {
+  const row = pos[0];
+  const col = pos[1];
+  const rowKing = kingPos[0];
+  const colKing = kingPos[1];
+  if (rowKing - row == 1 && Math.abs(col - colKing) == 1) return true;
+  return false;
+};
+console.log(
+  kingIsInCheck([
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", "♔", " ", " "],
+    [" ", " ", " ", "♝", " ", " ", " ", " "],
+    [" ", " ", "♟", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    ["♛", " ", " ", " ", " ", " ", " ", " "],
+  ])
+);
