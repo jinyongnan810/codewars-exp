@@ -24,25 +24,30 @@ function kingIsInCheck(chessboard: string[][]): boolean {
           break;
         }
         case bishop: {
-          controlledArea = [...controlledArea, ...controlledByQueen(pos)];
+          controlledArea = [...controlledArea, ...controlledByBishop(pos)];
           break;
         }
         case knight: {
-          controlledArea = [...controlledArea, ...controlledByQueen(pos)];
+          controlledArea = [...controlledArea, ...controlledByKnight(pos)];
           break;
         }
         case rook: {
-          controlledArea = [...controlledArea, ...controlledByQueen(pos)];
+          controlledArea = [...controlledArea, ...controlledByRook(pos)];
           break;
         }
         case pawn: {
-          controlledArea = [...controlledArea, ...controlledByQueen(pos)];
+          controlledArea = [...controlledArea, ...controlledByPawn(pos)];
           break;
         }
         default:
           break;
       }
     }
+  }
+  if (
+    controlledArea.find((pos) => pos[0] == kingPos[0] && pos[1] == kingPos[1])
+  ) {
+    return true;
   }
   console.log(controlledArea);
   console.log(kingPos);
@@ -152,6 +157,32 @@ const controlledByKnight = (pos: Position): Position[] => {
     const posBottomLeft: Position = [pos[0] + 1, pos[1] - 2];
     res.push(posBottomLeft);
     console.log(`posBottomLeft:${posBottomLeft}`);
+  }
+  return res;
+};
+
+const controlledByRook = (pos: Position): Position[] => {
+  const res: Position[] = [];
+  for (let i = 1; i < 8; i++) {
+    for (let j = 1; j < 8; j++) {
+      const posHorizontal: Position = [pos[0], (pos[1] + j) % 8];
+      const posVertical: Position = [(pos[0] + i) % 8, pos[1]];
+      res.push(posHorizontal);
+      res.push(posVertical);
+      console.log(`posHorizontal:${posHorizontal},posVertical:${posVertical}`);
+    }
+  }
+  return res;
+};
+const controlledByPawn = (pos: Position): Position[] => {
+  const res: Position[] = [];
+  if (pos[0] + 1 < 8) {
+    if (pos[1] - 1 >= 0) {
+      res.push([pos[0] + 1, pos[1] - 1]);
+    }
+    if (pos[1] + 1 < 8) {
+      res.push([pos[0] + 1, pos[1] + 1]);
+    }
   }
   return res;
 };
