@@ -13,6 +13,11 @@ int c(int k) {
     int count = kDecomposed[key]!;
     k3Decomposed[key] = count * 3;
   });
+  print(k3Decomposed);
+  // if contains any prime factor count is odd, return 0
+  if (k3Decomposed.keys.where((key) => k3Decomposed[key]!.isOdd).isNotEmpty) {
+    return 0;
+  }
   // flatten
   List<int> flatten = [];
   k3Decomposed.keys.forEach((key) {
