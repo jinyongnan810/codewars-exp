@@ -18,10 +18,17 @@ int c(int k) {
   if (k3Decomposed.keys.where((key) => k3Decomposed[key]!.isOdd).isNotEmpty) {
     return 0;
   }
+  // get prime decompositions of pairs (for x*x or y*y)
+  final Map<int, int> decomposedPairs = {};
+  k3Decomposed.keys.forEach((key) {
+    // for each prime factor
+    final int count = k3Decomposed[key]!;
+    decomposedPairs[key] = count ~/ 2;
+  });
   // flatten
   List<int> flatten = [];
-  k3Decomposed.keys.forEach((key) {
-    int count = k3Decomposed[key]!;
+  decomposedPairs.keys.forEach((key) {
+    int count = decomposedPairs[key]!;
     for (int i = 0; i < count; i++) {
       flatten.add(key);
     }
@@ -29,17 +36,39 @@ int c(int k) {
   // get pairs
   final pairs = getPairs(flatten);
   print(pairs);
-  return pairs.length * 2;
+  return pairs.length;
 }
 
-class Pair<T1, T2> {
-  final T1 a;
-  final T2 b;
+class Pair {
+  final Map<int, int> a;
+  final Map<int, int> b;
 
   Pair(this.a, this.b);
   @override
   String toString() {
     return '[$a,$b]';
+  }
+
+  bool isEqual(Pair other) {
+    final othera = other.a;
+    final otherb = other.b;
+    if (othera.keys.toSet().difference(a.keys.toSet()).isNotEmpty) {
+      return false;
+    }
+    if (otherb.keys.toSet().difference(b.keys.toSet()).isNotEmpty) {
+      return false;
+    }
+    for (int key in a.keys) {
+      if (a[key] != othera[key]) {
+        return false;
+      }
+    }
+    for (int key in a.keys) {
+      if (b[key] != otherb[key]) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -49,23 +78,19 @@ List<Pair> getPairs(List<int> list) {
   Map<int, int> itemsWithIndex = list.asMap();
   List<Pair> pairs = [];
   // 0000 to 1111
-  for (int i = 0; i < maxPairs - 1; i++) {
-    int a = 1;
-    int b = 1;
+  for (int i = 0; i < maxPairs; i++) {
+    Map<int, int> a = {};
+    Map<int, int> b = {};
     itemsWithIndex.forEach((index, value) {
       if (i >> index & 1 == 1) {
-        a *= value;
+        a[value] = a[value] == null ? 2 : a[value]! + 2;
       } else {
-        b *= value;
+        b[value] = b[value] == null ? 2 : b[value]! + 2;
       }
     });
-    // print('a:$a,b:$b');
-    final sqrta = sqrt(a);
-    if (sqrta.toInt() != sqrta) continue;
-    final sqrtb = sqrt(b);
-    if (sqrtb.toInt() != sqrtb) continue;
-    if (pairs.where((pair) => pair.a == a || pair.a == b).isEmpty)
-      pairs.add(Pair(a, b));
+    final newPair = Pair(a, b);
+    if (pairs.where((pair) => pair.isEqual(newPair)).isEmpty)
+      pairs.add(newPair);
   }
   return pairs;
 }
