@@ -4,9 +4,9 @@ import 'dart:math';
 // k*k*k=x*x*y*y
 int c(int k) {
   if (k == 1) return 1;
+  if (checkIsPrime(k)) return 0;
   // get prime decomposition of k
   final kDecomposed = primeDecomposition(k);
-  if (kDecomposed.keys.length == 1) return 0;
   // multiply all prime factors count by 3
   final Map<int, int> k3Decomposed = {};
   kDecomposed.keys.forEach((key) {
@@ -137,6 +137,6 @@ bool checkIsPrime(int n) {
 }
 
 main() {
-  print(c(2019));
-  print(c(4096576));
+  print(c(1369));
+  // print(c(4096576));
 }
