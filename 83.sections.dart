@@ -13,7 +13,6 @@ int c(int k) {
     int count = kDecomposed[key]!;
     k3Decomposed[key] = count * 3;
   });
-  print(k3Decomposed);
   // if contains any prime factor count is odd, return 0
   if (k3Decomposed.keys.where((key) => k3Decomposed[key]!.isOdd).isNotEmpty) {
     return 0;
@@ -25,18 +24,22 @@ int c(int k) {
     final int count = k3Decomposed[key]!;
     decomposedPairs[key] = count ~/ 2;
   });
+  print(decomposedPairs);
+  int res = 1;
+  decomposedPairs.values.forEach((value) => res *= (value + 1));
+  return res;
   // flatten
-  List<int> flatten = [];
-  decomposedPairs.keys.forEach((key) {
-    int count = decomposedPairs[key]!;
-    for (int i = 0; i < count; i++) {
-      flatten.add(key);
-    }
-  });
-  // get pairs
-  final pairs = getPairs(flatten);
-  print(pairs);
-  return pairs.length;
+  // List<int> flatten = [];
+  // decomposedPairs.keys.forEach((key) {
+  //   int count = decomposedPairs[key]!;
+  //   for (int i = 0; i < count; i++) {
+  //     flatten.add(key);
+  //   }
+  // });
+  // // get pairs
+  // final pairs = getPairs(flatten);
+  // print(pairs);
+  // return pairs.length;
 }
 
 class Pair {
@@ -137,6 +140,6 @@ bool checkIsPrime(int n) {
 }
 
 main() {
-  print(c(1369));
-  // print(c(4096576));
+  print(c(82944));
+  print(c(4096576));
 }
