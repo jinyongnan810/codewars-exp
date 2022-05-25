@@ -1,39 +1,34 @@
 // https://www.codewars.com/kata/58db9545facc51e3db00000a/train/javascript
 function compress(music: number[]): string {
   let res: string[] = [];
-  let stack: number[] = [];
-  let interval: number | null = null;
   for (let i = 0; i < music.length; i++) {
     const m = music[i];
-    stack.push(m);
-    console.log(`i=${music[i]},stack:${stack},interval:${interval}`);
-    if (stack.length == 1) continue;
-    const currentInterval = getInterval(stack);
-    if (currentInterval != null && interval != currentInterval) {
-      stack.pop();
-      if (stack.length == 1) {
-        res.push(stack[0].toString());
+    if (i == music.length - 1) {
+    } else {
+      const interval = music[i + 1] - m;
+      let end = i + 1;
+      while (
+        end < music.length &&
+        getInterval(music.slice(i, end + 1)) == interval
+      ) {
+        end++;
+      }
+      if (interval == 0) {
+        res.push(`${m}*${end - i + 1}`);
+        i = end + 1;
       } else {
-        const intervalForStack = getInterval(stack);
-        if (intervalForStack == 0) {
-          res.push(`${stack[0]}*${stack.length}`);
-        } else if (stack.length >= 3) {
-          const absInterval = Math.abs(intervalForStack!);
-          if (absInterval == 1) {
-            res.push(`${stack[0]}-${stack[stack.length - 1]}`);
+        if (end - i > 1) {
+          if (Math.abs(interval) == 1) {
+            res.push(`${m}-${music[end]}`);
           } else {
-            res.push(`${stack[0]}-${stack[stack.length - 1]}/${absInterval}`);
+            res.push(`${m}-${music[end]}/${Math.abs(interval)}`);
           }
+          i = end + 1;
         } else {
-          res.push(stack[0].toString());
-          res.push(stack[1].toString());
+          res.push(m.toString());
         }
       }
-      stack = [];
-      interval = null;
-      stack.push(m);
     }
-    interval = currentInterval;
   }
   return res.join(",");
 }
