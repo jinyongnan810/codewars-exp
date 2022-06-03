@@ -19,7 +19,7 @@ String decompose(String top, bottom) {
       i++;
       continue;
     }
-    int lcm = getLeaseCommonMultiple([bottomInt, i]);
+    int lcm = getLeaseCommonMultiple(bottomInt, i);
     topInt = (lcm ~/ bottomInt) * topInt;
     bottomInt = lcm;
     int iTop = 1 * (lcm ~/ i);
@@ -39,19 +39,24 @@ String decompose(String top, bottom) {
   return '[' + (result.join(', ')) + ']';
 }
 
-int getLeaseCommonMultiple(List<int> list) {
-  int gcd = getGreatestCommonDivisor(list);
-  return gcd *
-      list.fold<int>(
-          1, (previousValue, element) => previousValue * element ~/ gcd);
+int getLeaseCommonMultiple(int a, int b) {
+  final decomposedA = primeDecomposition(a);
+  final decomposedB = primeDecomposition(b);
+  final keysSet = decomposedA.keys.toSet();
+  Map<int, int> maxDecomposed = {};
+  keysSet.addAll(decomposedB.keys.toSet());
+  keysSet.forEach((key) {
+    int aCount = decomposedA[key] ?? 0;
+    int bCount = decomposedB[key] ?? 0;
+    int m = max(aCount, bCount);
+    maxDecomposed[key] = m;
+  });
+  int lcm = maxDecomposed.entries
+      .fold<int>(1, (prev, cur) => prev * (pow(cur.key, cur.value).toInt()));
+  return lcm;
 }
 
 int getGreatestCommonDivisor(List<int> list) {
-  // for this kata only
-  int a = list[0];
-  int b = list[1];
-  if (a % b == 0) return b;
-
   final max = list.fold<int>(0, (previousValue, element) {
     int s = element;
     return previousValue < s ? s : previousValue;
@@ -65,6 +70,33 @@ int getGreatestCommonDivisor(List<int> list) {
     }
   }
   return cd.fold(1, (previousValue, element) => previousValue * element);
+}
+
+Map<int, int> primeDecomposition(int n) {
+  if (checkIsPrime(n)) {
+    return {n: 1};
+  }
+  // get decompositions
+  int nTmp = n;
+  int s = sqrt(n).toInt();
+  Map<int, int> res = {};
+  for (int i = 2; i <= s; i++) {
+    if (!checkIsPrime(i)) continue;
+    int prime = i;
+    if (prime > nTmp) break;
+    while (nTmp % prime == 0) {
+      nTmp ~/= prime;
+      if (res[prime] != null)
+        res[prime] = (res[prime] ?? 0) + 1;
+      else
+        res[prime] = 1;
+    }
+    if (nTmp > 1 && checkIsPrime(nTmp)) {
+      res[nTmp] = 1;
+      break;
+    }
+  }
+  return res;
 }
 
 Map<int, bool> primes = {2: true, 3: true, 4: false};
@@ -81,9 +113,25 @@ bool checkIsPrime(int n) {
   return true;
 }
 
+//others
+int getLcm(int a, int b) {
+  return a * b ~/ getGcd(a, b);
+}
+
+int getGcd(int a, int b) {
+  while (b > 0) {
+    var temp = b;
+    b = a % b;
+    a = temp;
+  }
+  return a;
+}
+
 void main(List<String> args) {
-  // print(getLeaseCommonMultiple([2, 5]));
+  // print(getLeaseCommonMultiple(2, 5));
   // print(decompose('21', '23'));
   // print(decompose('66', '100'));
   // print(decompose('12', '5'));
+
+  print(getGcd(17, 9));
 }
