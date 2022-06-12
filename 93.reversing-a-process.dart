@@ -18,11 +18,14 @@ String decode(String r) {
   final str = r.replaceFirst(RegExp(n.toString()), '');
   final s = str.split('').map((c) {
     final index = alphabets.indexOf(c);
+    List tempRes = [];
     for (int i = 0; i < 26; i++) {
       if (i * n % 26 == index) {
-        return alphabets[i];
+        // print('$c, index:${index}, i:${i}, s:${alphabets[i]}');
+        tempRes.add(alphabets[i]);
       }
     }
+    if (tempRes.length == 1) return tempRes[0];
     return '-';
   }).join('');
   if (s.indexOf('-') >= 0) return "Impossible to decode";
@@ -30,7 +33,11 @@ String decode(String r) {
 }
 
 void main() {
-  print(encode('mer', 6015));
+  print(encode('aad', 5057));
+  print(encode('ccb', 5057));
+  print(encode('ccd', 5057));
+  print(encode('jdgegdidjkdahjbkeelg', 761328));
 
   print(decode('6015ekx'));
+  print(decode('5057aan'));
 }
