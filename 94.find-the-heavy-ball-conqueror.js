@@ -1,7 +1,7 @@
 //https://www.codewars.com/kata/544047f0cf362503e000036e/train/javascript
 // Seven of them have the same weight!!!!
 function findBall(scales) {
-  // call scales.getWeight() max 4 times
+  // call scales.getWeight() max 3 times
   // return indexOfHeavyBall;
   let leftPan = [0, 1, 2, 3];
   let rightPan = [4, 5, 6, 7];

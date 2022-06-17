@@ -3,24 +3,30 @@
 function findBall(scales) {
   // call scales.getWeight() max 2 times
   // return indexOfHeavyBall;
-  for (var i = 1; i < 8; i++) {
-    var leftPan = [i - 1];
-    var rightPan = [i];
-    var w = scales.getWeight(leftPan, rightPan);
-
-    if (w === -1) {
-      // left pan is heavier
-      return leftPan[0];
-    }
-
-    if (w === 1) {
-      // right pan is heavier
-      return rightPan[0];
-    }
+  let leftPan = [0, 1, 2];
+  let rightPan = [3, 4, 5];
+  let w = scales.getWeight(leftPan, rightPan);
+  if (w == -1) {
+    leftPan = [0];
+    rightPan = [1];
+    w = scales.getWeight(leftPan, rightPan);
+    if (w == -1) return 0;
+    if (w == 0) return 2;
+    if (w == 1) return 1;
+  }
+  if (w == 0) {
+    leftPan = [6];
+    rightPan = [7];
+    w = scales.getWeight(leftPan, rightPan);
+    if (w == -1) return 6;
+    if (w == 1) return 7;
+  }
+  if (w == 1) {
+    leftPan = [3];
+    rightPan = [4];
+    w = scales.getWeight(leftPan, rightPan);
+    if (w == -1) return 3;
+    if (w == 0) return 5;
+    if (w == 1) return 4;
   }
 }
-// sample: 1,2,3,4,5,6,7,8
-// if given 3 times // this won't work with try 1 get 0 for equal
-// try 1: 1,2,3,4  5,6,7,8
-// try 2: 5,6 7,8
-// try 3: 7 8
