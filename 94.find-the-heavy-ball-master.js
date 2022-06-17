@@ -1,4 +1,5 @@
 //https://www.codewars.com/kata/544034f426bc6adda200000e/train/javascript
+// Seven of them have the same weight!!!!
 function findBall(scales) {
   // call scales.getWeight() max 2 times
   // return indexOfHeavyBall;
