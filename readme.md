@@ -1,6 +1,93 @@
-#### Goal
+# Goal
 
 - Loosen the mind & have fun.
+
+---
+
+#### Day 97-117
+
+- No.[81-94](https://github.com/jinyongnan810/codewars-exp/compare/789b22f923b6086f17186703b569665c0f5cf440...898c310923fcb4b9a7f530d9f9505d2733749e82)
+- (typescript)check a map is different from the other
+
+```ts
+bool isEqual(Map<int,int> other) {
+    if (other.keys.toSet().difference(mine.keys.toSet()).isNotEmpty) {
+      return false;
+    }
+    for (int key in mine.keys) {
+      if (mine[key] != other[key]) {
+        return false;
+      }
+    }
+    return true;
+  }
+```
+
+- [example](https://github.com/jinyongnan810/codewars-exp/blob/898c310923fcb4b9a7f530d9f9505d2733749e82/85.get-x-for-limit-m.dart) of solving math equations
+- a [mind-binding project](https://github.com/jinyongnan810/codewars-exp/blob/898c310923fcb4b9a7f530d9f9505d2733749e82/89.bubbly-programming-lang.ts)(still not a clue)
+- calculate gcd & lcm
+
+```dart
+// my way
+int getLeaseCommonMultiple(int a, int b) {
+  final decomposedA = primeDecomposition(a);
+  final decomposedB = primeDecomposition(b);
+  final keysSet = decomposedA.keys.toSet();
+  Map<int, int> maxDecomposed = {};
+  keysSet.addAll(decomposedB.keys.toSet());
+  keysSet.forEach((key) {
+    int aCount = decomposedA[key] ?? 0;
+    int bCount = decomposedB[key] ?? 0;
+    int m = max(aCount, bCount);
+    maxDecomposed[key] = m;
+  });
+  int lcm = maxDecomposed.entries
+      .fold<int>(1, (prev, cur) => prev * (pow(cur.key, cur.value).toInt()));
+  return lcm;
+}
+
+int getGreatestCommonDivisor(List<int> list) {
+  final max = list.fold<int>(0, (previousValue, element) {
+    int s = element;
+    return previousValue < s ? s : previousValue;
+  });
+  List<int> cd = [];
+  for (int i = 2; i <= max; i++) {
+    if (!checkIsPrime(i)) continue;
+    while (list.every((element) => element % i == 0)) {
+      cd.add(i);
+      list = list.map((e) => (e / i).floor()).toList();
+    }
+  }
+  return cd.fold(1, (previousValue, element) => previousValue * element);
+}
+
+// the other people's way
+int getLcm(int a, int b) {
+  return a * b ~/ getGcd(a, b);
+}
+
+int getGcd(int a, int b) {
+  while (b > 0) {
+    var temp = b;
+    b = a % b;
+    a = temp;
+  }
+  return a;
+}
+```
+
+- (typescript)create 0~n-1 array
+
+```ts
+Array.from({ length: 5 }, (_, i) => i);
+```
+
+- (dart)create 0~n-1 array
+
+```dart
+Iterable.generate(5, (i) => i).toList();
+```
 
 ---
 
