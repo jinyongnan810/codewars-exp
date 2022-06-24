@@ -16,6 +16,7 @@ type Route = {
   route: string[];
   cost: number;
 };
+const startAndEndCity = "Notgnihsaw";
 function bestRoute(cities: string[], costs: number[][]): string[] {
   const citiesMap: Record<string, City> = {};
   cities.forEach((cityName, index) => {
@@ -23,16 +24,12 @@ function bestRoute(cities: string[], costs: number[][]): string[] {
     citiesMap[cityName] = city;
   });
   console.log(JSON.stringify(citiesMap));
-  const routes: Route[] = [];
-  cities.forEach((city) => {
-    const routesStartFromThisCity = getAllRoutes(
-      city,
-      cities.filter((c) => c != city),
-      citiesMap
-    );
-    routesStartFromThisCity.forEach((r) => routes.push(r));
-  });
-  const bestRoute = routes.reduce(
+  const routesStartFromNotgnihsaw = getAllRoutes(
+    startAndEndCity,
+    cities.filter((c) => c != startAndEndCity),
+    citiesMap
+  );
+  const bestRoute = routesStartFromNotgnihsaw.reduce(
     (prev, cur) => {
       if (cur.cost < prev.cost) {
         return cur;
@@ -50,12 +47,16 @@ const getAllRoutes = (
   citiesMap: Record<string, City>
 ): Route[] => {
   if (rest.length == 2) {
-    const route1 = rest;
+    const route1 = [...rest, startAndEndCity];
     const cost1 =
-      citiesMap[startFrom].to[rest[0]] + citiesMap[rest[0]].to[rest[1]];
-    const route2 = [rest[1], rest[0]];
+      citiesMap[startFrom].to[rest[0]] +
+      citiesMap[rest[0]].to[rest[1]] +
+      citiesMap[rest[1]].to[startAndEndCity];
+    const route2 = [rest[1], rest[0], startAndEndCity];
     const cost2 =
-      citiesMap[startFrom].to[rest[1]] + citiesMap[rest[1]].to[rest[0]];
+      citiesMap[startFrom].to[rest[1]] +
+      citiesMap[rest[1]].to[rest[0]] +
+      citiesMap[rest[0]].to[startAndEndCity];
     return [
       { route: route1, cost: cost1 },
       { route: route2, cost: cost2 },
@@ -74,3 +75,22 @@ const getAllRoutes = (
   });
   return res;
 };
+bestRoute(
+  ["Notgnihsaw", "Berlin", "Helsinki"],
+  [
+    [0, 800, 1500],
+    [900, 0, 350],
+    [1200, 650, 0],
+  ]
+);
+
+bestRoute(
+  ["Aleppo", "Shenyang", "Notgnihsaw", "Vienna", "Buenos Aires"],
+  [
+    [0, 1800, 1250, 1500, 2450],
+    [1400, 0, 1900, 1150, 2000],
+    [1300, 1200, 0, 900, 1450],
+    [3000, 1950, 800, 0, 1700],
+    [2800, 2400, 1650, 2250, 0],
+  ]
+);
