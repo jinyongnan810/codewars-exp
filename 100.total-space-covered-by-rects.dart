@@ -9,8 +9,16 @@ class Dot {
     return '[$x,$y]';
   }
 
-  bool isInRect(List<int> rect) {
+  bool isInRect_v1(List<int> rect) {
     if (x >= rect[0] && x < rect[2] && y >= rect[1] && y < rect[3]) return true;
+    return false;
+  }
+
+  bool isInRect(Rectangle rect) {
+    if (x >= rect.bottomLeft.x &&
+        x <= rect.bottomRight.x &&
+        y >= rect.bottomLeft.y &&
+        y <= rect.topLeft.y) return true;
     return false;
   }
 
@@ -28,7 +36,76 @@ class Dot {
   }
 }
 
+class Rectangle {
+  final Dot topLeft;
+  final Dot topRight;
+  final Dot bottomLeft;
+  final Dot bottomRight;
+  Rectangle(this.topLeft, this.topRight, this.bottomLeft, this.bottomRight);
+
+  int get areaCovered {
+    int width = topRight.x - topLeft.x;
+    int height = topLeft.y - bottomLeft.y;
+    return width * height;
+  }
+
+  @override
+  String toString() {
+    return '$topLeft $topRight $bottomLeft $bottomRight';
+  }
+}
+
 int calculate(List<List<int>> rectangles) {
+  List<Rectangle> rectanglesList = [];
+  int total = 0;
+  for (int i = 0; i < rectangles.length; i++) {
+    final rect = rectangles[i];
+    final topLeft = Dot(rect[0], rect[3]);
+    final topRight = Dot(rect[2], rect[3]);
+    final bottomLeft = Dot(rect[0], rect[1]);
+    final bottomRight = Dot(rect[2], rect[1]);
+    final rectangle = Rectangle(topLeft, topRight, bottomLeft, bottomRight);
+    rectanglesList.add(rectangle);
+  }
+  for (int i = 0; i < rectanglesList.length; i++) {
+    final rectangle = rectanglesList[i];
+    final topleftIsIn =
+        cornerIsInTheseRectangles(rectangle.topLeft, rectanglesList, i);
+    final topRightIsIn =
+        cornerIsInTheseRectangles(rectangle.topRight, rectanglesList, i);
+    final bottomLeftIsIn =
+        cornerIsInTheseRectangles(rectangle.bottomLeft, rectanglesList, i);
+    final bottomRightIsIn =
+        cornerIsInTheseRectangles(rectangle.bottomRight, rectanglesList, i);
+    final colideWith = Set<Rectangle>();
+    colideWith.addAll(topleftIsIn);
+    colideWith.addAll(topRightIsIn);
+    colideWith.addAll(bottomRightIsIn);
+    colideWith.addAll(bottomLeftIsIn);
+    if (colideWith.length == 0) {
+      total += rectangle.areaCovered;
+    } else {
+      // check duplicated area
+    }
+  }
+
+  return total;
+}
+
+Set<Rectangle> cornerIsInTheseRectangles(
+    Dot corner, List<Rectangle> rectangles, int exclude) {
+  Set<Rectangle> result = Set();
+  for (int i = 0; i < rectangles.length; i++) {
+    if (i == exclude) continue;
+    final rectangle = rectangles[i];
+    if (corner.isInRect(rectangle)) {
+      result.add(rectangle);
+    }
+  }
+  return result;
+}
+
+int calculate_v2(List<List<int>> rectangles) {
   Set<Dot> dots = Set();
   rectangles.forEach((rect) {
     for (int i = rect[0]; i < rect[2]; i++) {
@@ -64,7 +141,7 @@ int calculate_v1(List<List<int>> rectangles) {
   int res = 0;
   dots.forEach((dot) {
     try {
-      rectangles.firstWhere((rect) => dot.isInRect(rect));
+      rectangles.firstWhere((rect) => dot.isInRect_v1(rect));
       res++;
     } catch (e) {}
   });
@@ -7224,6 +7301,8 @@ const test = [
   [27812, 20319, 27813, 20320],
   [27815, 20319, 27816, 20322]
 ];
+// squares are quite large
+// solution like v2 counting 1 by 1 came too slow
 const test2 = [
   [881, 946, 1281, 1211],
   [931, 776, 951, 806],
@@ -10579,13 +10658,13 @@ void main() {
   // print(calculate([
   //   [0, 4, 11, 6]
   // ]));
-  // print(calculate([
-  //   [3, 3, 8, 5],
-  //   [6, 3, 8, 9],
-  //   [11, 6, 14, 12]
-  // ]));
+  print(calculate([
+    [3, 3, 8, 5],
+    [6, 3, 8, 9],
+    [11, 6, 14, 12]
+  ]));
 
-  print(calculate(test2));
+  // print(calculate(test2));
   final end = DateTime.now();
   print('took:${end.difference(start)}');
 }
