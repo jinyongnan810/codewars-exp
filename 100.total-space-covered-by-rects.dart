@@ -1,4 +1,112 @@
 // https://www.codewars.com/kata/55dcdd2c5a73bdddcb000044/train/dart
+
+class Rect {
+  final int minX;
+  final int minY;
+  final int maxX;
+  final int maxY;
+  Rect(this.minX, this.minY, this.maxX, this.maxY);
+  int get areaCovered {
+    int width = this.maxX - this.minX;
+    int height = this.maxY - this.minY;
+    return width * height;
+  }
+
+  bool isSame(Rect other) {
+    return this.minX == other.minX &&
+        this.minY == other.minY &&
+        this.maxX == other.maxX &&
+        this.maxY == other.maxY;
+  }
+}
+
+int calculate(List<List<int>> rectangles) {
+  try {
+    rectangles.firstWhere(
+        (rect) => rect[2] - rect[0] >= 300 || rect[3] - rect[1] >= 300);
+    print('use v4');
+    return calculate_v4(rectangles);
+  } catch (e) {
+    print('use v2');
+    return calculate_v2(rectangles);
+  }
+}
+
+int calculate_v4(List<List<int>> rectangles) {
+  // idea: cut rectangles by extended border lines,
+  // remove duplicated rectangles, then get total area
+  // this is good for large rectangles, but dramatically slow than v2 in the case of intersecting rectangles
+  List<Rect> originalRects = rectangles
+      .map((rect) => Rect(rect[0], rect[1], rect[2], rect[3]))
+      .toList();
+  List<Rect> finalRects = [];
+  Set<int> xLines = Set();
+  Set<int> yLines = Set();
+  originalRects.forEach((rect) {
+    xLines.add(rect.minX);
+    xLines.add(rect.maxX);
+    yLines.add(rect.minY);
+    yLines.add(rect.maxY);
+  });
+  // split rects by lines
+  // by x lines
+  List<Rect> rectsSplitByX = [];
+  for (int i = 0; i < originalRects.length; i++) {
+    Rect rect = originalRects[i];
+    List<Rect> splitedRects = [rect];
+    xLines.forEach((x) {
+      List<Rect> tempRects = [];
+      splitedRects.forEach((splitedRect) {
+        if (splitedRect.minX < x && splitedRect.maxX > x) {
+          tempRects.add(
+              Rect(splitedRect.minX, splitedRect.minY, x, splitedRect.maxY));
+          tempRects.add(
+              Rect(x, splitedRect.minY, splitedRect.maxX, splitedRect.maxY));
+        } else {
+          tempRects.add(splitedRect);
+        }
+      });
+      splitedRects = tempRects;
+    });
+    splitedRects.forEach((r) {
+      try {
+        rectsSplitByX.firstWhere((element) => element.isSame(r));
+      } catch (e) {
+        rectsSplitByX.add(r);
+      }
+    });
+  }
+  // by y lines
+  for (int i = 0; i < rectsSplitByX.length; i++) {
+    Rect rect = rectsSplitByX[i];
+    List<Rect> splitedRects = [rect];
+    yLines.forEach((y) {
+      List<Rect> tempRects = [];
+      splitedRects.forEach((splitedRect) {
+        if (splitedRect.minY < y && splitedRect.maxY > y) {
+          tempRects.add(
+              Rect(splitedRect.minX, splitedRect.minY, splitedRect.maxX, y));
+          tempRects.add(
+              Rect(splitedRect.minX, y, splitedRect.maxX, splitedRect.maxY));
+        } else {
+          tempRects.add(splitedRect);
+        }
+      });
+      splitedRects = tempRects;
+    });
+    splitedRects.forEach((r) {
+      try {
+        finalRects.firstWhere((element) => element.isSame(r));
+      } catch (e) {
+        finalRects.add(r);
+      }
+    });
+  }
+
+  return finalRects.fold<int>(
+      0, (value, element) => value + element.areaCovered);
+}
+
 class Dot {
   final int x;
   final int y;
@@ -55,7 +163,9 @@ class Rectangle {
   }
 }
 
-int calculate(List<List<int>> rectangles) {
+int calculate_v3_failed(List<List<int>> rectangles) {
+  // idea: get duplicated area by corner covered
+  // to complicated
   List<Rectangle> rectanglesList = [];
   int total = 0;
   for (int i = 0; i < rectangles.length; i++) {
@@ -106,6 +216,8 @@ Set<Rectangle> cornerIsInTheseRectangles(
 }
 
 int calculate_v2(List<List<int>> rectangles) {
+  // idea: count by area by dots within the rectangles
+  // its too slow when the rectangles are too large
   Set<Dot> dots = Set();
   rectangles.forEach((rect) {
     for (int i = rect[0]; i < rect[2]; i++) {
@@ -118,6 +230,8 @@ int calculate_v2(List<List<int>> rectangles) {
 }
 
 int calculate_v1(List<List<int>> rectangles) {
+  // idea: count dots within the max area
+  // its too slow when the rectangles are too far away
   // if (rectangles.length == 1) return calculateSingle(rectangles[0]);
   // get range
   int minX = 10000;
@@ -146,12 +260,6 @@ int calculate_v1(List<List<int>> rectangles) {
     } catch (e) {}
   });
   return res;
-}
-
-int calculateSingle(List<int> rect) {
-  final w = rect[2] - rect[0];
-  final h = rect[3] - rect[1];
-  return w * h;
 }
 
 const test = [
@@ -10658,13 +10766,15 @@ void main() {
   // print(calculate([
   //   [0, 4, 11, 6]
   // ]));
-  print(calculate([
-    [3, 3, 8, 5],
-    [6, 3, 8, 9],
-    [11, 6, 14, 12]
-  ]));
+  // print(calculate([
+  //   [3, 3, 8, 5],
+  //   [6, 3, 8, 9],
+  //   [11, 6, 14, 12]
+  // ]));
 
-  // print(calculate(test2));
+  // print(calculate_v2(test));
+
+  print(calculate(test2));
   final end = DateTime.now();
   print('took:${end.difference(start)}');
 }
