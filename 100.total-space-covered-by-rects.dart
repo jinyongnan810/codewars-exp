@@ -12,6 +12,24 @@ class Rect {
     return width * height;
   }
 
+  @override
+  String toString() {
+    return 'Rect{minX: $minX, minY: $minY, maxX: $maxX, maxY: $maxY}';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      // identical(this, other) ||
+      other is Rect &&
+      // runtimeType == other.runtimeType &&
+      minX == other.minX &&
+      minY == other.minY &&
+      maxX == other.maxX &&
+      maxY == other.maxY;
+
+  @override
+  int get hashCode => minX + minY + maxX + maxY;
+
   bool isSame(Rect other) {
     return this.minX == other.minX &&
         this.minY == other.minY &&
@@ -39,7 +57,7 @@ int calculate_v4(List<List<int>> rectangles) {
   List<Rect> originalRects = rectangles
       .map((rect) => Rect(rect[0], rect[1], rect[2], rect[3]))
       .toList();
-  List<Rect> finalRects = [];
+  Set<Rect> finalRects = Set();
   Set<int> xLines = Set();
   Set<int> yLines = Set();
   originalRects.forEach((rect) {
@@ -50,7 +68,7 @@ int calculate_v4(List<List<int>> rectangles) {
   });
   // split rects by lines
   // by x lines
-  List<Rect> rectsSplitByX = [];
+  Set<Rect> rectsSplitByX = Set();
   for (int i = 0; i < originalRects.length; i++) {
     Rect rect = originalRects[i];
     List<Rect> splitedRects = [rect];
@@ -69,16 +87,12 @@ int calculate_v4(List<List<int>> rectangles) {
       splitedRects = tempRects;
     });
     splitedRects.forEach((r) {
-      try {
-        rectsSplitByX.firstWhere((element) => element.isSame(r));
-      } catch (e) {
-        rectsSplitByX.add(r);
-      }
+      rectsSplitByX.add(r);
     });
   }
   // by y lines
   for (int i = 0; i < rectsSplitByX.length; i++) {
-    Rect rect = rectsSplitByX[i];
+    Rect rect = rectsSplitByX.elementAt(i);
     List<Rect> splitedRects = [rect];
     yLines.forEach((y) {
       List<Rect> tempRects = [];
@@ -95,11 +109,7 @@ int calculate_v4(List<List<int>> rectangles) {
       splitedRects = tempRects;
     });
     splitedRects.forEach((r) {
-      try {
-        finalRects.firstWhere((element) => element.isSame(r));
-      } catch (e) {
-        finalRects.add(r);
-      }
+      finalRects.add(r);
     });
   }
 
@@ -10772,9 +10782,9 @@ void main() {
   //   [11, 6, 14, 12]
   // ]));
 
-  // print(calculate_v2(test));
+  print(calculate_v4(test));
 
-  print(calculate(test2));
+  print(calculate_v4(test2));
   final end = DateTime.now();
   print('took:${end.difference(start)}');
 }
