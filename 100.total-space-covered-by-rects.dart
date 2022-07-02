@@ -91,8 +91,9 @@ int calculate_v4(List<List<int>> rectangles) {
     });
   }
   // by y lines
-  for (int i = 0; i < rectsSplitByX.length; i++) {
-    Rect rect = rectsSplitByX.elementAt(i);
+  // for (int i = 0; i < rectsSplitByX.length; i++) {
+  //   Rect rect = rectsSplitByX.elementAt(i);
+  rectsSplitByX.forEach((rect) {
     List<Rect> splitedRects = [rect];
     yLines.forEach((y) {
       List<Rect> tempRects = [];
@@ -111,7 +112,7 @@ int calculate_v4(List<List<int>> rectangles) {
     splitedRects.forEach((r) {
       finalRects.add(r);
     });
-  }
+  });
 
   return finalRects.fold<int>(
       0, (value, element) => value + element.areaCovered);
