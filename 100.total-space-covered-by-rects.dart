@@ -1,22 +1,11 @@
 // https://www.codewars.com/kata/55dcdd2c5a73bdddcb000044/train/dart
 
 int calculate(List<List<int>> rectangles) {
-  int minX = 10000;
-  int maxX = -10000;
-  rectangles.forEach((rect) {
-    if (rect[0] < minX) minX = rect[0];
-    if (rect[2] > maxX) maxX = rect[2];
-  });
-  if (maxX - minX > 100000) {
-    print('use v4');
-    return calculate_v4(rectangles);
-  }
-
   try {
     rectangles.firstWhere(
         (rect) => rect[2] - rect[0] >= 300 || rect[3] - rect[1] >= 300);
-    print('use v5');
-    return calculate_v5(rectangles, minX, maxX);
+    print('use v4');
+    return calculate_v4(rectangles);
   } catch (e) {
     print('use v2');
     return calculate_v2(rectangles);
@@ -79,6 +68,8 @@ class Ranges {
 int calculate_v5(List<List<int>> rectangles, int minX, int maxX) {
   // idea: check 1 pixel width, get how may area are covered
   // then do the sum
+  // not so good with long rectangles
+  // has some unknown bug
 
   int res = 0;
   for (int x = minX; x < maxX; x++) {
@@ -154,19 +145,20 @@ int calculate_v4(List<List<int>> rectangles) {
   for (int i = 0; i < originalRects.length; i++) {
     Rect rect = originalRects[i];
     List<Rect> splitedRects = [rect];
+    // cut original rects by vertical lines
     xLines.forEach((x) {
-      List<Rect> tempRects = [];
-      splitedRects.forEach((splitedRect) {
+      for (int j = 0; j < splitedRects.length; j++) {
+        final splitedRect = splitedRects[j];
         if (splitedRect.minX < x && splitedRect.maxX > x) {
-          tempRects.add(
-              Rect(splitedRect.minX, splitedRect.minY, x, splitedRect.maxY));
-          tempRects.add(
-              Rect(x, splitedRect.minY, splitedRect.maxX, splitedRect.maxY));
+          splitedRects.replaceRange(j, j + 1, [
+            Rect(splitedRect.minX, splitedRect.minY, x, splitedRect.maxY),
+            Rect(x, splitedRect.minY, splitedRect.maxX, splitedRect.maxY),
+          ]);
+          j++;
         } else {
-          tempRects.add(splitedRect);
+          // continue
         }
-      });
-      splitedRects = tempRects;
+      }
     });
     splitedRects.forEach((r) {
       rectsSplitByX.add(r);
@@ -178,18 +170,19 @@ int calculate_v4(List<List<int>> rectangles) {
   rectsSplitByX.forEach((rect) {
     List<Rect> splitedRects = [rect];
     yLines.forEach((y) {
-      List<Rect> tempRects = [];
-      splitedRects.forEach((splitedRect) {
+      // cut original rects by horizontal lines
+      for (int j = 0; j < splitedRects.length; j++) {
+        final splitedRect = splitedRects[j];
         if (splitedRect.minY < y && splitedRect.maxY > y) {
-          tempRects.add(
-              Rect(splitedRect.minX, splitedRect.minY, splitedRect.maxX, y));
-          tempRects.add(
-              Rect(splitedRect.minX, y, splitedRect.maxX, splitedRect.maxY));
+          splitedRects.replaceRange(j, j + 1, [
+            Rect(splitedRect.minX, splitedRect.minY, splitedRect.maxX, y),
+            Rect(splitedRect.minX, y, splitedRect.maxX, splitedRect.maxY)
+          ]);
+          j++;
         } else {
-          tempRects.add(splitedRect);
+          // continue
         }
-      });
-      splitedRects = tempRects;
+      }
     });
     splitedRects.forEach((r) {
       finalRects.add(r);
@@ -18134,26 +18127,20 @@ const test4 = [
 ];
 void main() {
   final start = DateTime.now();
-  print(calculate([
+  print(calculate_v4([
     [0, 4, 11, 6]
   ]));
-  print(calculate([
+  print(calculate_v4([
     [3, 3, 8, 5],
     [6, 3, 8, 9],
     [11, 6, 14, 12]
   ]));
 
-  Ranges ranges = Ranges();
-  ranges.add(Range(0, 5));
-  ranges.add(Range(2, 10));
-  ranges.add(Range(3, 8));
-  ranges.add(Range(12, 20));
-  ranges.add(Range(18, 224));
-  ranges.add(Range(12, 224));
-  ranges.add(Range(-10, -2));
-  ranges.add(Range(225, 3000));
-  ranges.add(Range(8, 300));
-  print(ranges);
+  // Ranges ranges = Ranges();
+  // ranges.add(Range(0, 5));
+  // ranges.add(Range(20, 25));
+  // ranges.add(Range(10, 21));
+  // print(ranges);
 
   // print(calculate(test));
   // print(calculate(test2));
