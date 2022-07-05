@@ -92,9 +92,7 @@ class Rect {
   final int maxY;
   Rect(this.minX, this.minY, this.maxX, this.maxY);
   int get areaCovered {
-    int width = this.maxX - this.minX;
-    int height = this.maxY - this.minY;
-    return width * height;
+    return (this.maxX - this.minX) * (this.maxY - this.minY);
   }
 
   @override
@@ -114,22 +112,14 @@ class Rect {
 
   @override
   int get hashCode => minX + minY + maxX + maxY;
-
-  bool isSame(Rect other) {
-    return this.minX == other.minX &&
-        this.minY == other.minY &&
-        this.maxX == other.maxX &&
-        this.maxY == other.maxY;
-  }
 }
 
 int calculate_v4(List<List<int>> rectangles) {
   // idea: cut rectangles by extended border lines,
   // remove duplicated rectangles, then get total area
   // this is good for large rectangles, but dramatically slow than v2 in the case of intersecting rectangles
-  List<Rect> originalRects = rectangles
-      .map((rect) => Rect(rect[0], rect[1], rect[2], rect[3]))
-      .toList();
+  final originalRects =
+      rectangles.map((rect) => Rect(rect[0], rect[1], rect[2], rect[3]));
   Set<Rect> finalRects = Set();
   Set<int> xLines = Set();
   Set<int> yLines = Set();
@@ -143,7 +133,7 @@ int calculate_v4(List<List<int>> rectangles) {
   // by x lines
   Set<Rect> rectsSplitByX = Set();
   for (int i = 0; i < originalRects.length; i++) {
-    Rect rect = originalRects[i];
+    Rect rect = originalRects.elementAt(i);
     List<Rect> splitedRects = [rect];
     // cut original rects by vertical lines
     xLines.forEach((x) {
@@ -160,9 +150,7 @@ int calculate_v4(List<List<int>> rectangles) {
         }
       }
     });
-    splitedRects.forEach((r) {
-      rectsSplitByX.add(r);
-    });
+    rectsSplitByX.addAll(splitedRects);
   }
   // by y lines
   // for (int i = 0; i < rectsSplitByX.length; i++) {
@@ -184,9 +172,7 @@ int calculate_v4(List<List<int>> rectangles) {
         }
       }
     });
-    splitedRects.forEach((r) {
-      finalRects.add(r);
-    });
+    finalRects.addAll(splitedRects);
   });
 
   return finalRects.fold<int>(
