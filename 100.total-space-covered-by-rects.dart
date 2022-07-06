@@ -83,24 +83,44 @@ int calculate_v5(List<List<int>> rectangles) {
   // then do the sum
   // not so good with long rectangles
   // has some unknown bug
-  int minX = 10000;
-  int maxX = -10000;
+  int minX = 1000000;
+  int maxX = -1000000;
+  int minY = 1000000;
+  int maxY = -1000000;
   rectangles.forEach((rect) {
     if (rect[0] < minX) minX = rect[0];
+    if (rect[1] < minY) minY = rect[1];
     if (rect[2] > maxX) maxX = rect[2];
+    if (rect[3] > maxY) maxY = rect[3];
   });
 
   int res = 0;
-  for (int x = minX; x < maxX; x++) {
-    Ranges ranges = Ranges();
-    for (int i = 0; i < rectangles.length; i++) {
-      if (rectangles[i][0] <= x && rectangles[i][2] > x) {
-        final range = Range(rectangles[i][1], rectangles[i][3]);
-        ranges.add(range);
+  if (maxX - minX <= maxY - minY) {
+    print('v5(by x)');
+    for (int x = minX; x < maxX; x++) {
+      Ranges ranges = Ranges();
+      for (int i = 0; i < rectangles.length; i++) {
+        if (rectangles[i][0] <= x && rectangles[i][2] > x) {
+          final range = Range(rectangles[i][1], rectangles[i][3]);
+          ranges.add(range);
+        }
       }
+      res += ranges.areaCovered;
     }
-    res += ranges.areaCovered;
+  } else {
+    print('v5(by y)');
+    for (int y = minY; y < maxY; y++) {
+      Ranges ranges = Ranges();
+      for (int i = 0; i < rectangles.length; i++) {
+        if (rectangles[i][1] <= y && rectangles[i][3] > y) {
+          final range = Range(rectangles[i][0], rectangles[i][2]);
+          ranges.add(range);
+        }
+      }
+      res += ranges.areaCovered;
+    }
   }
+
   return res;
 }
 
