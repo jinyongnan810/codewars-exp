@@ -43,26 +43,28 @@ class Ranges {
   void add(Range range) {
     if (ranges.length == 0) ranges.add(range);
     for (int i = 0; i < ranges.length; i++) {
-      if (range.start < ranges[i].start || range.start < ranges[i].end) {
+      final rangeI = ranges[i];
+      if (range.start < rangeI.start || range.start < rangeI.end) {
         final start = i;
+        final rangeStart = ranges[start];
         for (int j = i; j < ranges.length; j++) {
-          if (range.end < ranges[j].start) {
+          final rangeJ = ranges[j];
+          if (range.end < rangeJ.start) {
             if (i == j)
               ranges.insert(start, range);
             else
               ranges.replaceRange(start, j, [range]);
             return;
-          } else if (range.end < ranges[j].end) {
-            int min = range.start < ranges[start].start
-                ? range.start
-                : ranges[start].start;
-            int max = ranges[j].end;
+          } else if (range.end < rangeJ.end) {
+            int min =
+                range.start < rangeStart.start ? range.start : rangeStart.start;
+            int max = rangeJ.end;
             ranges.replaceRange(start, j + 1, [Range(min, max)]);
             return;
           }
         }
-        int min = range.start < ranges[i].start ? range.start : ranges[i].start;
-        int max = range.end > ranges[i].end ? range.end : ranges[i].end;
+        int min = range.start < rangeI.start ? range.start : rangeI.start;
+        int max = range.end > rangeI.end ? range.end : rangeI.end;
         ranges.replaceRange(start, ranges.length, [Range(min, max)]);
         return;
       }
@@ -83,13 +85,9 @@ int calculate_v5(List<List<int>> rectangles) {
   // has some unknown bug
   int minX = 10000;
   int maxX = -10000;
-  int minY = 10000;
-  int maxY = -10000;
   rectangles.forEach((rect) {
     if (rect[0] < minX) minX = rect[0];
-    if (rect[1] < minY) minY = rect[1];
     if (rect[2] > maxX) maxX = rect[2];
-    if (rect[3] > maxY) maxY = rect[3];
   });
 
   int res = 0;
