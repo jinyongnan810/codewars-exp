@@ -7,8 +7,8 @@ int calculate(List<List<int>> rectangles) {
     if (rectangles
         .sublist(1, 20)
         .every((r) => r.first == startingX && r[1] == startingY)) {
-      print('use v5');
-      return calculate_v5(rectangles);
+      print('use v6');
+      return calculate_v6_same_start_point(rectangles);
     }
   }
 
@@ -20,6 +20,64 @@ int calculate(List<List<int>> rectangles) {
   } catch (e) {
     print('use v2');
     return calculate_v2(rectangles);
+  }
+}
+
+int calculate_v6_same_start_point(List<List<int>> rectangles) {
+  // requirement: all rects start from same point
+  int minX = 1000000;
+  int maxX = -1000000;
+  int minY = 1000000;
+  int maxY = -1000000;
+  Rect startPoint = Rect(
+      rectangles[0][0], rectangles[0][1], rectangles[0][0], rectangles[0][1]);
+  int maxXRectIndex = -1;
+  int maxYRectIndex = -1;
+  int totalSpace = 0;
+  List<int> removedIndex = [];
+  while (true) {
+    for (int i = 0; i < rectangles.length; i++) {
+      if (removedIndex.contains(i)) continue;
+      final rect = rectangles[i];
+      if (rect[2] > maxX) {
+        maxX = rect[2];
+        maxXRectIndex = i;
+      }
+      if (rect[3] > maxY) {
+        maxY = rect[3];
+        maxYRectIndex = i;
+      }
+    }
+    if (maxXRectIndex == -1 || maxYRectIndex == -1) {
+      return totalSpace;
+    }
+
+    if (maxXRectIndex == maxYRectIndex) {
+      final maxRect = Rect(startPoint.minX, startPoint.minY,
+          rectangles[maxXRectIndex][2], rectangles[maxXRectIndex][3]);
+      print('maxRect: $maxRect');
+      return totalSpace + maxRect.areaCovered;
+    } else {
+      maxX = rectangles[maxYRectIndex][2];
+      maxY = rectangles[maxXRectIndex][3];
+
+      final maxXRect = Rect(startPoint.minX, startPoint.minY,
+          rectangles[maxXRectIndex][2], rectangles[maxXRectIndex][3]);
+      final maxYRect = Rect(startPoint.minX, startPoint.minY,
+          rectangles[maxYRectIndex][2], rectangles[maxYRectIndex][3]);
+
+      print(
+          'maxXRect: $maxXRect,maxYRect: $maxYRect, newMaxX: $maxX, newMaxY: $maxY');
+
+      totalSpace += maxXRect.areaCovered +
+          maxYRect.areaCovered -
+          Rect(startPoint.minX, startPoint.minY, maxX, maxY).areaCovered;
+      startPoint = Rect(maxX, maxY, maxX, maxY);
+      removedIndex.add(maxXRectIndex);
+      removedIndex.add(maxYRectIndex);
+      maxXRectIndex = -1;
+      maxYRectIndex = -1;
+    }
   }
 }
 
@@ -18622,7 +18680,7 @@ void main() {
   // print(calculate(test2));
   // print(calculate(test3));
   // print(calculate(test4));
-  print(calculate_v2(test5));
+  print(calculate_v6_same_start_point(test5));
   final end = DateTime.now();
   print('took:${end.difference(start)}');
 }
