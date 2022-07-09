@@ -39,6 +39,10 @@ int calculate_v6_same_start_point(List<List<int>> rectangles) {
     for (int i = 0; i < rectangles.length; i++) {
       if (removedIndex.contains(i)) continue;
       final rect = rectangles[i];
+      if (rect[2] <= startPoint.minX || rect[3] <= startPoint.minY) {
+        removedIndex.add(i);
+        continue;
+      }
       if (rect[2] > maxX) {
         maxX = rect[2];
         maxXRectIndex = i;
