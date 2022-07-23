@@ -30,16 +30,27 @@ const isTarget = (n: number): false | number => {
 };
 const getDividers = (decompositions: Record<number, number>): number[] => {
   const keys = Object.keys(decompositions).map((s) => parseInt(s));
-  const res: number[] = [1];
-  let tmp = 1;
-  keys.forEach((n) => {
-    const count = decompositions[n];
-    for (let i = 0; i < count; i++) {
-      tmp *= n;
-      res.push(tmp);
-    }
-  });
-  return res;
+  const flattenList = keys
+    .map((k) => {
+      const flatten = [];
+      const count = decompositions[k];
+      for (let i = 0; i < count; i++) {
+        flatten.push(k);
+      }
+      return flatten;
+    })
+    .reduce((prev, cur) => prev.concat(cur), []);
+  const max = 1 << flattenList.length;
+  const res: Set<number> = new Set();
+  res.add(1);
+  for (let i = 1; i <= max; i++) {
+    res.add(
+      flattenList
+        .filter((_, index) => (i >> index) & 1)
+        .reduce((prev, cur) => prev * cur, 1)
+    );
+  }
+  return Array.from(res.values());
 };
 
 const primeDecomposition = (n: number): Record<number, number> => {
