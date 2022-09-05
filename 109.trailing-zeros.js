@@ -19,23 +19,25 @@ function zeros(n) {
     .sort((a, b) => b - a)
     .filter((i) => i <= n)[0];
   console.log(`largestCache:${largestCache}`);
-  let twos = largestCache ? cache[largestCache].twos : 0;
+  // let twos = largestCache ? cache[largestCache].twos : 0;
   let fives = largestCache ? cache[largestCache].fives : 0;
   for (let i = largestCache ? largestCache + 1 : 2; i <= n; i++) {
     let tmp = i;
-    while (tmp % 2 == 0) {
-      twos++;
-      tmp /= 2;
-    }
+    // while (tmp % 2 == 0) {
+    //   twos++;
+    //   tmp /= 2;
+    // }
     while (tmp % 5 == 0) {
       fives++;
       tmp /= 5;
     }
   }
 
-  const res = Math.min(twos, fives);
+  // const res = Math.min(twos, fives);
+  const res = fives;
 
-  cache[n] = { twos: twos, fives: fives };
+  // cache[n] = { twos: twos, fives: fives };
+  cache[n] = { fives: fives };
   return res;
 }
 
