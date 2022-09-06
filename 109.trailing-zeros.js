@@ -14,6 +14,7 @@ const cache = {
 };
 function zeros(n) {
   console.log(n);
+  if (n < 5) return 0;
   const largestCache = Object.keys(cache)
     .map((s) => parseInt(s))
     .sort((a, b) => b - a)
@@ -21,7 +22,12 @@ function zeros(n) {
   console.log(`largestCache:${largestCache}`);
   // let twos = largestCache ? cache[largestCache].twos : 0;
   let fives = largestCache ? cache[largestCache].fives : 0;
-  for (let i = largestCache ? largestCache + 1 : 2; i <= n; i++) {
+  let nearestFive = largestCache ? largestCache : 0;
+  if (nearestFive % 5 == 0) nearestFive += 5;
+  while (nearestFive % 5 != 0) {
+    nearestFive++;
+  }
+  for (let i = nearestFive; i <= n; i += 5) {
     let tmp = i;
     // while (tmp % 2 == 0) {
     //   twos++;
@@ -43,15 +49,6 @@ function zeros(n) {
 
 const main = () => {
   console.log(zeros(100000000));
-  console.log(zeros(200000000));
-  console.log(zeros(300000000));
-  console.log(zeros(400000000));
-  console.log(zeros(500000000));
-  console.log(zeros(600000000));
-  console.log(zeros(700000000));
-  console.log(zeros(800000000));
-  console.log(zeros(900000000));
-  console.log(zeros(1000000000));
   console.log(JSON.stringify(cache));
 };
 main();
