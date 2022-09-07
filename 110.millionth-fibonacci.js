@@ -20,15 +20,15 @@ const fibPlus = (n) => {
   return b;
 };
 
-const fibPlus_recursion = (n) => {
-  if (n <= max) {
-    return cachePlus[n];
-  }
-  const fib = fibPlus(n - 1) + fibPlus(n - 2);
-  max = n;
-  cachePlus[n] = fib;
-  return fib;
-};
+// const fibPlus_recursion = (n) => {
+//   if (n <= max) {
+//     return cachePlus[n];
+//   }
+//   const fib = fibPlus(n - 1) + fibPlus(n - 2);
+//   max = n;
+//   cachePlus[n] = fib;
+//   return fib;
+// };
 
 const fibMinus = (n) => {
   const isMinus = n % 2 == 0 ? -1n : 1n;
@@ -36,15 +36,15 @@ const fibMinus = (n) => {
   return fib;
 };
 
-const fibMinus_recursion = (n) => {
-  if (n >= min) {
-    return cacheMinus[n * -1];
-  }
-  const fib = fibMinus(n + 2) - fibMinus(n + 1);
-  min = n;
-  cacheMinus[n * -1] = fib;
-  return fib;
-};
+// const fibMinus_recursion = (n) => {
+//   if (n >= min) {
+//     return cacheMinus[n * -1];
+//   }
+//   const fib = fibMinus(n + 2) - fibMinus(n + 1);
+//   min = n;
+//   cacheMinus[n * -1] = fib;
+//   return fib;
+// };
 
 function fib(n) {
   console.log(n);
@@ -57,11 +57,14 @@ function fib(n) {
 }
 
 function main() {
-  for (let i = 0; i <= 10; i++) console.log(`fib ${i}: ${fib(i)}`);
-  console.log(cachePlus);
-  for (let i = 0; i >= -10; i--) console.log(`fib ${i}: ${fib(i)}`);
-  console.log(cacheMinus);
-  // console.log(fib(1043713));
+  // for (let i = 0; i <= 10; i++) console.log(`fib ${i}: ${fib(i)}`);
+  // console.log(cachePlus);
+  // for (let i = 0; i >= -10; i--) console.log(`fib ${i}: ${fib(i)}`);
+  // console.log(cacheMinus);
+  const start = Date.now();
+  fib(1043713);
+  console.log(Date.now() - start);
+  // stack 6525ms a&b 6515ms
 }
 
 main();
