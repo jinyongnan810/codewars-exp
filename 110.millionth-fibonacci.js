@@ -4,6 +4,12 @@ const cacheMinus = [0n, 1n];
 let min = -1;
 let max = 1;
 
+// ref: https://web.archive.org/web/20220614001843/https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-11.html#%_sec_1.2.4
+// ref: https://www.nayuki.io/page/fast-fibonacci-algorithms#:~:text=Summary%3A%20The%20two%20fast%20Fibonacci,when%20Karatsuba%20multiplication%20is%20used.
+// given f(k)&f(k+1)
+// f(2k) = f(k)(2f(k+1)-f(k))
+// f(2k+1) = f(k+1)^2 + f(k)^2
+
 const fibPlus = (n) => {
   if (n <= max) {
     return cachePlus[n];
