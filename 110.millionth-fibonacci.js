@@ -1,8 +1,4 @@
 // https://www.codewars.com/kata/53d40c1e2f13e331fc000c26/train/javascript
-const cachePlus = [0n, 1n];
-const cacheMinus = [0n, 1n];
-let min = -1;
-let max = 1;
 
 // ref: https://web.archive.org/web/20220614001843/https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-11.html#%_sec_1.2.4
 // ref: https://www.nayuki.io/page/fast-fibonacci-algorithms#:~:text=Summary%3A%20The%20two%20fast%20Fibonacci,when%20Karatsuba%20multiplication%20is%20used.
@@ -11,18 +7,31 @@ let max = 1;
 // f(2k+1) = f(k+1)^2 + f(k)^2
 
 const fibPlus = (n) => {
-  if (n <= max) {
-    return cachePlus[n];
+  if (n == 0) return 0n;
+  if (n == 1) return 1n;
+  if (n == 2) return 1n;
+  if (n == 3) return 2n;
+  if (n % 2 == 0) {
+    const k = Math.floor(n / 2);
+    const fibK = fibPlus(k);
+    const fibKPlus1 = fibPlus(k + 1);
+    return fibK * (2n * fibKPlus1 - fibK);
+  } else {
+    const k = Math.floor((n - 1) / 2);
+    const fibK = fibPlus(k);
+    const fibKPlus1 = fibPlus(k + 1);
+    return fibKPlus1 ** 2n + fibK ** 2n;
   }
-  let a = cachePlus[max - 1];
-  let b = cachePlus[max];
-  for (let i = max + 1; i <= n; i++) {
+};
+
+const fibPlusFlat = (n) => {
+  if (n == 0) return 0n;
+  if (n == 1) return 1n;
+  for (let i = 2; i <= n; i++) {
     const fib = a + b;
-    // cachePlus.push(fib);
     a = b;
     b = fib;
   }
-  // max = n;
   return b;
 };
 
@@ -63,13 +72,11 @@ function fib(n) {
 }
 
 function main() {
-  // for (let i = 0; i <= 10; i++) console.log(`fib ${i}: ${fib(i)}`);
-  // console.log(cachePlus);
-  // for (let i = 0; i >= -10; i--) console.log(`fib ${i}: ${fib(i)}`);
-  // console.log(cacheMinus);
-  const start = Date.now();
-  fib(1043713);
-  console.log(Date.now() - start);
+  for (let i = 0; i <= 10; i++) console.log(`fib ${i}: ${fib(i)}`);
+  for (let i = 0; i >= -10; i--) console.log(`fib ${i}: ${fib(i)}`);
+  // const start = Date.now();
+  // fib(1043713);
+  // console.log(Date.now() - start);
   // stack 6525ms a&b 6515ms
 }
 
