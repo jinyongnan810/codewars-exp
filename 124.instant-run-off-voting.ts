@@ -5,14 +5,13 @@ function runoff(voters: string[][]): string | undefined {
   while (true) {
     console.log(`data:${JSON.stringify(data)}`);
     const votes: Record<string, number> = {};
+
+    data[0].forEach((candidate) => (votes[candidate] = 0));
+
     for (let i = 0; i < data.length; i++) {
       const firstChoice = data[i][0];
       if (!firstChoice) return;
-      if (votes[firstChoice]) {
-        votes[firstChoice] += 1;
-      } else {
-        votes[firstChoice] = 1;
-      }
+      votes[firstChoice] += 1;
     }
     let least = 999;
     for (const entry of Object.entries(votes)) {
@@ -34,12 +33,19 @@ function runoff(voters: string[][]): string | undefined {
   }
 }
 
+// no one's first vote will be removed first
+// const data = [
+//   ["a", "c", "b", "d", "e"],
+//   ["d", "c", "a", "b", "e"],
+//   ["e", "b", "d", "a", "c"],
+//   ["e", "a", "b", "c", "d"],
+//   ["b", "c", "e", "a", "d"],
+// ];
+
 const data = [
-  ["a", "c", "b", "d", "e"],
-  ["d", "c", "a", "b", "e"],
-  ["e", "b", "d", "a", "c"],
-  ["e", "a", "b", "c", "d"],
-  ["b", "c", "e", "a", "d"],
+  ["Johan Liebert", "Daisuke Aramaki", "Reinhard von Musel", "Frank Underwood"],
+  ["Reinhard von Musel", "Johan Liebert", "Daisuke Aramaki", "Frank Underwood"],
+  ["Reinhard von Musel", "Frank Underwood", "Johan Liebert", "Daisuke Aramaki"],
 ];
 
 // const data = [
