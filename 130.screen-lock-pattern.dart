@@ -10,6 +10,10 @@ class Lock {
     return dots.firstWhere((dot) => dot.row == row && dot.column == column);
   }
 
+  Dot getDotByLabel(String label) {
+    return dots.firstWhere((dot) => dot.displayText == label);
+  }
+
   List<Dot> nextMove(Dot current) {
     List<Dot> res = [];
     dots.forEach((dot) {
@@ -31,6 +35,10 @@ class Lock {
         if (between.used) {
           res.add(dot);
         }
+      } else if ((dot.column - current.column).abs() == 2 &&
+          (dot.row - current.row).abs() == 2) {
+      } else {
+        res.add(dot);
       }
     });
     return res;
@@ -80,6 +88,17 @@ int countPatternsFromSub(String start, int points, Lock currentLock) {
       .toList();
   final lock = Lock(dots: dots);
   lock.markUsed(start);
+  final nextMoves = lock.nextMove(lock.getDotByLabel(start));
+  final res = nextMoves
+      .map((move) => countPatternsFromSub(move.displayText, points - 1, lock))
+      .fold<int>(
+          0, (previousValue, currentValue) => previousValue + currentValue);
+  return res;
+}
 
-  return 0;
+void main() {
+  print(countPatternsFrom('C', 2));
+  print(countPatternsFrom('D', 3));
+  print(countPatternsFrom('E', 4)); // current is 224, should be 256
+  print(countPatternsFrom('E', 8)); // current is 12880, should be 23280
 }
