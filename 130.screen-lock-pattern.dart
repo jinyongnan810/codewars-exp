@@ -37,6 +37,10 @@ class Lock {
         }
       } else if ((dot.column - current.column).abs() == 2 &&
           (dot.row - current.row).abs() == 2) {
+        final between = getDot(1, 1);
+        if (between.used) {
+          res.add(dot);
+        }
       } else {
         res.add(dot);
       }
@@ -99,6 +103,6 @@ int countPatternsFromSub(String start, int points, Lock currentLock) {
 void main() {
   print(countPatternsFrom('C', 2));
   print(countPatternsFrom('D', 3));
-  print(countPatternsFrom('E', 4)); // current is 224, should be 256
-  print(countPatternsFrom('E', 8)); // current is 12880, should be 23280
+  print(countPatternsFrom('E', 4));
+  print(countPatternsFrom('E', 8));
 }
