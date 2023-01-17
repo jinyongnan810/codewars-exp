@@ -52,7 +52,7 @@ func findMissingLetter(_ chArr: [Character]) -> Character {
     return ""
 }
 
-print(findMissingLetter(["a","b","c","d","f"]))
+print(findMissingLetter(["a", "b", "c", "d", "f"]))
 
 // solutions
 // https://www.codewars.com/kata/5839edaa6754d6fec10000a2/solutions
