@@ -1,4 +1,5 @@
 // https://www.codewars.com/kata/5765870e190b1472ec0022a2/train/swift
+import Foundation
 func pathFinder(_ maze: String) -> Bool {
   let map = maze.split(separator: "\n").map({Array($0)})
   return hasPath(map, 0, 0 )
@@ -100,5 +101,19 @@ let fourthMaze = """
                 .....W
                 ....W.
                 """
-print(pathFinder(firstMaze))
+
+// tips: measuring time elapsed
+func measure <T> (_ f: @autoclosure () -> T) -> (result: T, duration: String) {
+    let startTime = CFAbsoluteTimeGetCurrent()
+    let result = f()
+    let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+    return (result, "Elapsed time is \(timeElapsed.formatted()) seconds.")
+}
+
+print(measure(pathFinder(firstMaze)))
+print(measure(pathFinder(secondMaze)))
+print(measure(pathFinder(thirdMaze)))
+print(measure(pathFinder(fourthMaze)))
 // TODO: deal with large mazes
+// some ideas
+// if the route fails, mark the route points to un reachable 
