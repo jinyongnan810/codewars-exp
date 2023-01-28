@@ -2,31 +2,24 @@
 import Foundation
 func pathFinder(_ maze: String) -> Bool {
   let map = maze.split(separator: "\n").map({Array($0)})
-  return hasPath(map, 0, 0 )
+  let res = hasPath(map, 0, 0 )
+  return res.ok
 }
 var count = 0
-func hasPath(_ map: [[Character]], _ currentX: Int, _ currentY: Int) -> Bool {
+typealias Pos = (x: Int, y: Int)
+func hasPath(_ map: [[Character]], _ currentX: Int, _ currentY: Int) -> (ok: Bool, ngs: [Pos]) {
 
     let width = map[0].count
     let height = map.count
     if currentX == width-1 && currentY == height-1 {
-        return true
+        return (ok: true, ngs: [])
     }
     // ref: https://program-life.com/667
     // ref: https://stackoverflow.com/questions/27812433/how-do-i-make-a-exact-duplicate-copy-of-an-array
     var newMap = map
     // mark as passed
     newMap[currentY][currentX] = "K"
-
-    //
-    // if count >= 10 {
-    //     return false
-    // }
-    // print(newMap)
-    // count+=1
-    //
-    // print(map)
-    // print(newMap)
+    var ngs: [Pos] = []
 
     // print(
     // """
@@ -39,37 +32,60 @@ func hasPath(_ map: [[Character]], _ currentX: Int, _ currentY: Int) -> Bool {
 
     // can go right
     if (width > currentX + 1) && canGo(newMap[currentY][currentX+1]) {
-        if hasPath(newMap, currentX + 1, currentY) {
-            return true
+        let res = hasPath(newMap, currentX + 1, currentY)
+        if res.ok {
+            return (ok: true, ngs: [])
+        } else {
+            ngs.append(contentsOf: res.ngs)
+            for ng in res.ngs {
+                newMap[ng.y][ng.x] = "N"
+            }
         }
     }
     // can go left
     if currentX>0 && canGo(newMap[currentY][currentX-1]) {
-        if hasPath(newMap, currentX - 1, currentY) {
-            return true
+        let res = hasPath(newMap, currentX - 1, currentY)
+        if res.ok {
+            return (ok: true, ngs: [])
+        } else {
+            ngs.append(contentsOf: res.ngs)
+            for ng in res.ngs {
+                newMap[ng.y][ng.x] = "N"
+            }
         }
     }
     // can go up
     if currentY>0 && canGo(newMap[currentY-1][currentX]) {
-        if hasPath(newMap, currentX, currentY-1) {
-            return true
+        let res = hasPath(newMap, currentX, currentY-1)
+        if res.ok {
+            return (ok: true, ngs: [])
+        } else {
+            ngs.append(contentsOf: res.ngs)
+            for ng in res.ngs {
+                newMap[ng.y][ng.x] = "N"
+            }
         }
     }
     // can go down
     if (height > currentY+1) && canGo(newMap[currentY+1][currentX]) {
-        if hasPath(newMap, currentX, currentY+1) {
-            return true
+        let res = hasPath(newMap, currentX, currentY+1)
+        if res.ok {
+            return (ok: true, ngs: [])
+        } else {
+            ngs.append(contentsOf: res.ngs)
+            for ng in res.ngs {
+                newMap[ng.y][ng.x] = "N"
+            }
         }
     }
 
-    return false
+    ngs.append((x: currentX, y: currentY))
+
+    return (ok: false, ngs: ngs)
 }
 
 func canGo(_ v: Character) -> Bool {
-    if v == "W" || v == "K" {
-        return false
-    }
-    return true
+    return v == "."
 }
 
 let firstMaze = """
