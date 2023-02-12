@@ -1,9 +1,36 @@
 // https://www.codewars.com/kata/573182c405d14db0da00064e/train/swift
 import Foundation
 func consecKprimes(_ k: Int, _ arr: [Int]) -> Int {
-    // your code
-    return 0
+    if arr.count <= 1 {
+        return 0
+    }
+    var res = 0
+    var previousIsKPrime = false
+    for n in arr {
+        let kPrimeForN = checkK(n)
+        if kPrimeForN == k {
+            if previousIsKPrime {
+                res += 1
+            } else {
+                previousIsKPrime = true
+            }
+        } else {
+            previousIsKPrime = false
+        }
+    }
+
+    return res
 }
+
+func checkK(_ n: Int) -> Int {
+    let primeDecompositions = primeDecomposition(n)
+    var k = 0
+    for primeWithCount in primeDecompositions {
+        k += primeWithCount.value
+    }
+    return k
+}
+
 func primeDecomposition(_ n: Int) -> [Int: Int] {
     if checkIsPrime(n) {
         return [n: 1]
@@ -51,4 +78,20 @@ func checkIsPrime(_ n: Int) -> Bool {
     }
 }
 
-print(primeDecomposition(10005))
+print(checkK(10005))
+print(consecKprimes(3, [10158, 10182, 10184, 10172, 10179, 10168, 10156, 10165, 10155, 10161, 10178, 10170]))
+
+// primeDecomposition of others
+func primeFactors(_ n: Int) -> Int {
+    var nb = n
+    var i = 2
+    var cnt = 0
+    while nb > 1 {
+        while nb % i == 0 {
+            cnt += 1
+            nb /= i
+        }
+        i += 1
+    }
+    return cnt
+}
