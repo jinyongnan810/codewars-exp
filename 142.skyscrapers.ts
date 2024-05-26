@@ -28,8 +28,10 @@ type Cell = {
 class Board {
   cells: Cell[][];
   clues: Clues;
-  constructor(clues: number[]) {
-    this.cells = [];
+  constructor(clues: number[], cells: number[][] = []) {
+    this.cells = cells.map((row) =>
+      row.map((value) => ({ value, possibleValues: [value] }))
+    );
     for (let i = 0; i < 6; i++) {
       const row: Cell[] = [];
       for (let j = 0; j < 6; j++) {
@@ -187,6 +189,54 @@ class Board {
       }
     }
   };
+
+  checkCluesFit = () => {
+    for (let i = 0; i < 6; i++) {
+      const [left, right] = this.getRowClues(i);
+      const rowValues = this.getRowValues(i);
+      const [countFromLeft, countFromRight] =
+        this.getCountFromEachDirection(rowValues);
+      if (
+        (left != UNKNOWN && countFromLeft !== left) ||
+        (right != UNKNOWN && countFromRight !== right)
+      ) {
+        return false;
+      }
+    }
+    for (let j = 0; j < 6; j++) {
+      const [top, bottom] = this.getColumnClues(j);
+      const columnValues = this.getColumnValues(j);
+      const [countFromTop, countFromBottom] =
+        this.getCountFromEachDirection(columnValues);
+      if (
+        (top != UNKNOWN && countFromTop !== top) ||
+        (bottom != UNKNOWN && countFromBottom !== bottom)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  getCountFromEachDirection = (values: number[]) => {
+    let max = 0;
+    let countFromStart = 0;
+    for (let i = 0; i < 6; i++) {
+      if (values[i] > max) {
+        max = values[i];
+        countFromStart++;
+      }
+    }
+    let countFromEnd = 0;
+    max = 0;
+    for (let i = 5; i >= 0; i--) {
+      if (values[i] > max) {
+        max = values[i];
+        countFromEnd++;
+      }
+    }
+    return [countFromStart, countFromEnd];
+  };
 }
 
 const main = () => {
@@ -195,5 +245,23 @@ const main = () => {
     0, 0, 0, 2, 2, 0, 0, 0, 0, 6, 3, 0, 0, 4, 0, 0, 0, 0, 4, 4, 0, 3, 0, 0,
   ];
   solvePuzzle(clues);
+
+  // test();
 };
+
+const test = () => {
+  const board = new Board(
+    [0, 0, 0, 2, 2, 0, 0, 0, 0, 6, 3, 0, 0, 4, 0, 0, 0, 0, 4, 4, 0, 3, 0, 0],
+    [
+      [5, 6, 1, 4, 3, 2],
+      [4, 1, 3, 2, 6, 5],
+      [2, 3, 6, 1, 5, 4],
+      [6, 5, 4, 3, 2, 1],
+      [1, 2, 5, 6, 4, 3],
+      [3, 4, 2, 5, 1, 6],
+    ]
+  );
+  console.log(board.checkCluesFit());
+};
+
 main();
