@@ -7,6 +7,13 @@ function solvePuzzle(input: number[]) {
   board.checkHas1();
   // memo3: if sum of clues is 7, then 6's position is fixed
   board.checkClueSum7();
+
+  // FIXME: remove this test
+  const column5 = board.getColumn(4);
+  const clue5 = board.getColumnClues(4);
+  const possibleSequences = Board.getAllPossibleSequences(column5, clue5);
+  console.log(JSON.stringify(possibleSequences));
+
   // no clue yet for the rest
   board.printPossibleValues();
   board.printBoard();
@@ -23,6 +30,11 @@ const UNKNOWN = 0;
 type Cell = {
   value: number;
   possibleValues: number[];
+};
+type SequenceAndCount = {
+  sequence: number[];
+  countFromStart: number;
+  countFromEnd: number;
 };
 // type Board = Cell[][];
 class Board {
@@ -195,7 +207,7 @@ class Board {
       const [left, right] = this.getRowClues(i);
       const rowValues = this.getRowValues(i);
       const [countFromLeft, countFromRight] =
-        this.getCountFromEachDirection(rowValues);
+        Board.getCountFromEachDirection(rowValues);
       if (
         (left != UNKNOWN && countFromLeft !== left) ||
         (right != UNKNOWN && countFromRight !== right)
@@ -207,7 +219,7 @@ class Board {
       const [top, bottom] = this.getColumnClues(j);
       const columnValues = this.getColumnValues(j);
       const [countFromTop, countFromBottom] =
-        this.getCountFromEachDirection(columnValues);
+        Board.getCountFromEachDirection(columnValues);
       if (
         (top != UNKNOWN && countFromTop !== top) ||
         (bottom != UNKNOWN && countFromBottom !== bottom)
@@ -218,7 +230,7 @@ class Board {
     return true;
   };
 
-  getCountFromEachDirection = (values: number[]) => {
+  static getCountFromEachDirection = (values: number[]) => {
     let max = 0;
     let countFromStart = 0;
     for (let i = 0; i < 6; i++) {
@@ -237,7 +249,73 @@ class Board {
     }
     return [countFromStart, countFromEnd];
   };
+
+  static getAllPossibleSequences = (cells: Cell[], clues: number[]) => {
+    const [clue1, clue2] = clues;
+    return fullSequencesAndCounts.filter((s) => {
+      const { sequence, countFromStart, countFromEnd } = s;
+      const [a, b, c, d, e, f] = sequence;
+      // match possible values
+      if (
+        !(
+          cells[0].possibleValues.includes(a) &&
+          cells[1].possibleValues.includes(b) &&
+          cells[2].possibleValues.includes(c) &&
+          cells[3].possibleValues.includes(d) &&
+          cells[4].possibleValues.includes(e) &&
+          cells[5].possibleValues.includes(f)
+        )
+      ) {
+        return false;
+      }
+      // match clues
+      if (clue1 !== UNKNOWN && countFromStart !== clue1) {
+        return false;
+      }
+      if (clue2 !== UNKNOWN && countFromEnd !== clue2) {
+        return false;
+      }
+      return true;
+    });
+  };
 }
+
+//#region common functions
+const getSequences = (possibleValues: number[]) => {
+  const result: number[][] = [];
+  possibleValues.forEach((value) => {
+    const rest = possibleValues.filter((v) => v !== value);
+    if (rest.length === 0) {
+      result.push([value]);
+    } else {
+      const restSequences = getSequences(rest);
+      restSequences.map((sequence) => {
+        result.push([value, ...sequence]);
+      });
+    }
+  });
+  return result;
+};
+
+const filterSequences = (
+  array: SequenceAndCount[],
+  predicate: (element: SequenceAndCount) => boolean
+) => {
+  const result: SequenceAndCount[] = [];
+  for (let i = 0; i < array.length; i++) {
+    if (predicate(array[i])) {
+      result.push(array[i]);
+    }
+  }
+  return result;
+};
+
+//#endregion
+const fullSequences = getSequences([1, 2, 3, 4, 5, 6]);
+const fullSequencesAndCounts: SequenceAndCount[] = fullSequences.map((s) => {
+  const [countFromStart, countFromEnd] = Board.getCountFromEachDirection(s);
+  return { sequence: s, countFromStart, countFromEnd };
+});
 
 const main = () => {
   const clues = [
