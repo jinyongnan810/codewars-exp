@@ -1,23 +1,38 @@
 // https://www.codewars.com/kata/5679d5a3f2272011d700000d/train/javascript
 function solvePuzzle(input: number[]) {
-  const board = new Board(input);
+  const cells = [];
+  for (let i = 0; i < 6; i++) {
+    const row: Cell[] = [];
+    for (let j = 0; j < 6; j++) {
+      row.push({ value: UNKNOWN, possibleValues: [1, 2, 3, 4, 5, 6] });
+    }
+    cells.push(row);
+  }
+  const countFromTop = input.slice(0, 6);
+  const countFromRight = input.slice(6, 12);
+  const countFromBottom = input.slice(12, 18).reverse();
+  const countFromLeft = input.slice(18, 24).reverse();
+  const clues = {
+    countFromTop,
+    countFromRight,
+    countFromBottom,
+    countFromLeft,
+  };
+  const board = new Board(cells, clues);
+
   // memo1: if clue is 6, then the row or column is [1,2,3,4,5,6]
   board.checkHas6();
   // memo2: if clue is 1, then the next cell is 6
   board.checkHas1();
   // memo3: if sum of clues is 7, then 6's position is fixed
   board.checkClueSum7();
-
-  // FIXME: remove this test
-  const column5 = board.getColumn(4);
-  const clue5 = board.getColumnClues(4);
-  const possibleSequences = Board.getAllPossibleSequences(column5, clue5);
-  console.log(JSON.stringify(possibleSequences));
-
-  // no clue yet for the rest
-  board.printPossibleValues();
-  board.printBoard();
-  return board.toResult();
+  // recursive search
+  const result = findSolutions(board);
+  if (result === null) {
+    throw new Error("No solution");
+  }
+  result.printBoard();
+  return result.toResult();
 }
 
 type Clues = {
@@ -36,32 +51,22 @@ type SequenceAndCount = {
   countFromStart: number;
   countFromEnd: number;
 };
-// type Board = Cell[][];
+type BoardAllPossibilities = {
+  row: {
+    solved: boolean;
+    possibleSequences: SequenceAndCount[];
+  }[];
+  column: {
+    solved: boolean;
+    possibleSequences: SequenceAndCount[];
+  }[];
+};
 class Board {
   cells: Cell[][];
   clues: Clues;
-  constructor(clues: number[], cells: number[][] = []) {
-    this.cells = cells.map((row) =>
-      row.map((value) => ({ value, possibleValues: [value] }))
-    );
-    for (let i = 0; i < 6; i++) {
-      const row: Cell[] = [];
-      for (let j = 0; j < 6; j++) {
-        row.push({ value: UNKNOWN, possibleValues: [1, 2, 3, 4, 5, 6] });
-      }
-      this.cells.push(row);
-    }
-
-    const countFromTop = clues.slice(0, 6);
-    const countFromRight = clues.slice(6, 12);
-    const countFromBottom = clues.slice(12, 18).reverse();
-    const countFromLeft = clues.slice(18, 24).reverse();
-    this.clues = {
-      countFromTop,
-      countFromRight,
-      countFromBottom,
-      countFromLeft,
-    };
+  constructor(cells: Cell[][], clues: Clues) {
+    this.cells = cells;
+    this.clues = clues;
   }
 
   getRow = (i: number) => this.cells[i];
@@ -184,17 +189,25 @@ class Board {
           // update same row
           for (let k = 0; k < 6; k++) {
             if (k !== j) {
-              this.cells[i][k].possibleValues = this.cells[i][
-                k
-              ].possibleValues.filter((v) => v !== value);
+              const newPossibleValues = this.cells[i][k].possibleValues.filter(
+                (v) => v !== value
+              );
+              if (newPossibleValues.length === 0) {
+                throw new Error("No possible values");
+              }
+              this.cells[i][k].possibleValues = newPossibleValues;
             }
           }
           // update same column
           for (let k = 0; k < 6; k++) {
             if (k !== i) {
-              this.cells[k][j].possibleValues = this.cells[k][
-                j
-              ].possibleValues.filter((v) => v !== value);
+              const newPossibleValues = this.cells[k][j].possibleValues.filter(
+                (v) => v !== value
+              );
+              if (newPossibleValues.length === 0) {
+                throw new Error("No possible values");
+              }
+              this.cells[k][j].possibleValues = newPossibleValues;
             }
           }
         }
@@ -230,6 +243,101 @@ class Board {
     return true;
   };
 
+  copyWithRow(i: number, values: number[]): Board | null {
+    const newCells = this.cells.map((row, index) => {
+      if (index === i) {
+        return values.map((value) => ({ value, possibleValues: [value] }));
+      }
+      return row.map((cell) => this.copyCell(cell));
+    });
+    const newBoard = new Board(newCells, this.clues);
+    try {
+      newBoard.refreshPossibleValues();
+      return newBoard;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  copyWithColumn(j: number, values: number[]): Board | null {
+    const newCells = this.cells.map((row, i) =>
+      row.map((cell, index) => {
+        if (index === j) {
+          return { value: values[i], possibleValues: [values[i]] };
+        }
+        return this.copyCell(cell);
+      })
+    );
+    const newBoard = new Board(newCells, this.clues);
+    try {
+      newBoard.refreshPossibleValues();
+      return newBoard;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  copy() {
+    return new Board(
+      this.cells.map((row) => row.map((cell) => this.copyCell(cell))),
+      this.clues
+    );
+  }
+
+  copyCell(cell: Cell) {
+    return { value: cell.value, possibleValues: cell.possibleValues.slice() };
+  }
+
+  static checkRowOrColumnIsSolved = (cells: Cell[]) => {
+    return cells.every((cell) => cell.value !== UNKNOWN);
+  };
+
+  checkIsSolved = () => {
+    for (let i = 0; i < 6; i++) {
+      if (!Board.checkRowOrColumnIsSolved(this.getRow(i))) {
+        return false;
+      }
+      if (!Board.checkRowOrColumnIsSolved(this.getColumn(i))) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  getAllPossibleSequences = (): BoardAllPossibilities | null => {
+    const result: BoardAllPossibilities = {
+      row: [],
+      column: [],
+    };
+    for (let i = 0; i < 6; i++) {
+      const row = this.getRow(i);
+      if (Board.checkRowOrColumnIsSolved(row)) {
+        result.row.push({ solved: true, possibleSequences: [] });
+        continue;
+      }
+      const clues = this.getRowClues(i);
+      const possibleSequences = Board.getPossibleSequences(row, clues);
+      if (possibleSequences.length === 0) {
+        return null;
+      }
+      result.row.push({ solved: false, possibleSequences });
+    }
+    for (let j = 0; j < 6; j++) {
+      const column = this.getColumn(j);
+      if (Board.checkRowOrColumnIsSolved(column)) {
+        result.column.push({ solved: true, possibleSequences: [] });
+        continue;
+      }
+      const clues = this.getColumnClues(j);
+      const possibleSequences = Board.getPossibleSequences(column, clues);
+      if (possibleSequences.length === 0) {
+        return null;
+      }
+      result.column.push({ solved: false, possibleSequences });
+    }
+    return result;
+  };
+
   static getCountFromEachDirection = (values: number[]) => {
     let max = 0;
     let countFromStart = 0;
@@ -250,7 +358,10 @@ class Board {
     return [countFromStart, countFromEnd];
   };
 
-  static getAllPossibleSequences = (cells: Cell[], clues: number[]) => {
+  static getPossibleSequences = (
+    cells: Cell[],
+    clues: number[]
+  ): SequenceAndCount[] => {
     const [clue1, clue2] = clues;
     return fullSequencesAndCounts.filter((s) => {
       const { sequence, countFromStart, countFromEnd } = s;
@@ -310,6 +421,67 @@ const filterSequences = (
   return result;
 };
 
+// TODO: do recursive search
+
+const findSolutions = (board: Board): Board | null => {
+  const allPossibleSequences = board.getAllPossibleSequences();
+  if (allPossibleSequences === null) {
+    return null;
+  }
+  if (board.checkIsSolved()) {
+    return board;
+  }
+
+  // find the row or column with the minimum number of possible sequences
+  const { row, column } = allPossibleSequences;
+  let minRowCount = 1000;
+  let minRowIndex = -1;
+  for (let i = 0; i < 6; i++) {
+    if (!row[i].solved && row[i].possibleSequences.length < minRowCount) {
+      minRowCount = row[i].possibleSequences.length;
+      minRowIndex = i;
+    }
+  }
+  let minColumnCount = 1000;
+  let minColumnIndex = -1;
+  for (let i = 0; i < 6; i++) {
+    if (
+      !column[i].solved &&
+      column[i].possibleSequences.length < minColumnCount
+    ) {
+      minColumnCount = column[i].possibleSequences.length;
+      minColumnIndex = i;
+    }
+  }
+
+  // do recursive search
+  if (minRowCount <= minColumnCount) {
+    for (let i = 0; i < row[minRowIndex].possibleSequences.length; i++) {
+      const sequence = row[minRowIndex].possibleSequences[i].sequence;
+      const newBoard = board.copyWithRow(minRowIndex, sequence);
+      if (newBoard !== null) {
+        const result = findSolutions(newBoard);
+        if (result !== null) {
+          return result;
+        }
+      }
+    }
+  } else {
+    for (let i = 0; i < column[minColumnIndex].possibleSequences.length; i++) {
+      const sequence = column[minColumnIndex].possibleSequences[i].sequence;
+      const newBoard = board.copyWithColumn(minColumnIndex, sequence);
+      if (newBoard !== null) {
+        const result = findSolutions(newBoard);
+        if (result !== null) {
+          return result;
+        }
+      }
+    }
+  }
+
+  return null;
+};
+
 //#endregion
 const fullSequences = getSequences([1, 2, 3, 4, 5, 6]);
 const fullSequencesAndCounts: SequenceAndCount[] = fullSequences.map((s) => {
@@ -319,27 +491,13 @@ const fullSequencesAndCounts: SequenceAndCount[] = fullSequences.map((s) => {
 
 const main = () => {
   const clues = [
-    // 3, 2, 2, 3, 2, 1, 1, 2, 3, 3, 2, 2, 5, 1, 2, 2, 4, 3, 3, 2, 1, 2, 2, 4,
-    0, 0, 0, 2, 2, 0, 0, 0, 0, 6, 3, 0, 0, 4, 0, 0, 0, 0, 4, 4, 0, 3, 0, 0,
+    3, 2, 2, 3, 2, 1, 1, 2, 3, 3, 2, 2, 5, 1, 2, 2, 4, 3, 3, 2, 1, 2, 2, 4,
+    // 0, 0, 0, 2, 2, 0, 0, 0, 0, 6, 3, 0, 0, 4, 0, 0, 0, 0, 4, 4, 0, 3, 0, 0,
   ];
+  const startTime = new Date().getTime();
   solvePuzzle(clues);
-
-  // test();
-};
-
-const test = () => {
-  const board = new Board(
-    [0, 0, 0, 2, 2, 0, 0, 0, 0, 6, 3, 0, 0, 4, 0, 0, 0, 0, 4, 4, 0, 3, 0, 0],
-    [
-      [5, 6, 1, 4, 3, 2],
-      [4, 1, 3, 2, 6, 5],
-      [2, 3, 6, 1, 5, 4],
-      [6, 5, 4, 3, 2, 1],
-      [1, 2, 5, 6, 4, 3],
-      [3, 4, 2, 5, 1, 6],
-    ]
-  );
-  console.log(board.checkCluesFit());
+  const endTime = new Date().getTime();
+  console.log(`Time: ${endTime - startTime}ms`);
 };
 
 main();
