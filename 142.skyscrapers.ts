@@ -421,8 +421,6 @@ const filterSequences = (
   return result;
 };
 
-// TODO: do recursive search
-
 const findSolutions = (board: Board): Board | null => {
   const allPossibleSequences = board.getAllPossibleSequences();
   if (allPossibleSequences === null) {
@@ -482,7 +480,6 @@ const findSolutions = (board: Board): Board | null => {
   return null;
 };
 
-//#endregion
 const fullSequences = getSequences([1, 2, 3, 4, 5, 6]);
 const fullSequencesAndCounts: SequenceAndCount[] = fullSequences.map((s) => {
   const [countFromStart, countFromEnd] = Board.getCountFromEachDirection(s);
