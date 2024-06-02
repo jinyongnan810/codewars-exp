@@ -1,8 +1,15 @@
 // https://www.codewars.com/kata/57ff9d3b8f7dda23130015fa/train/javascript
 function solveMine(map: string, n: number): string {
   const mineSweeperMap = new MineSweeperMap(map);
+  mineSweeperMap.loop();
   mineSweeperMap.printMap();
-  console.log(JSON.stringify(mineSweeperMap.getSurroundingDots(0, 5)));
+  // now here
+  `? ? ? ? ? ?
+  ? ? 2 1 2 ?
+  ? ? 2 0 1 ?
+  ? ? 2 1 2 ?
+  1 1 1 1 ? ?
+  0 0 0 1 ? ?`;
   return "?";
 }
 
@@ -17,8 +24,9 @@ type Dot = {
 };
 
 class MineSweeperMap {
-  dots: Dot[][] = [];
+  dots: Dot[][];
   constructor(map: string) {
+    this.dots = [];
     const lines = map.split("\n").map((line) => line.trim().split(" "));
     for (let y = 0; y < lines.length; y++) {
       this.dots.push(
@@ -39,32 +47,67 @@ class MineSweeperMap {
     return this.dots.length;
   }
 
-  getSurroundingDots = (x: number, y: number): (Dot | null)[] => {
+  loop() {
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        const dot = this.dots[y][x];
+        if (dot.type === "number") {
+          if (dot.value === 0) {
+            this.getSurroundingDots(x, y).forEach((dot) => {
+              if (dot != null && dot.type === "unknown") {
+                this.openDot(dot.x, dot.y);
+              }
+            });
+          }
+        }
+      }
+    }
+  }
+
+  getSurroundingDots(x: number, y: number): (Dot | null)[] {
     return [
       // top left
-      this.dots[y - 1]?.[x - 1] || null,
+      (this.dots[y - 1] != null && this.dots[y - 1][x - 1]) || null,
       // top
-      this.dots[y - 1]?.[x] || null,
+      (this.dots[y - 1] != null && this.dots[y - 1][x]) || null,
       // top right
-      this.dots[y - 1]?.[x + 1] || null,
+      (this.dots[y - 1] != null && this.dots[y - 1][x + 1]) || null,
       // left
-      this.dots[y]?.[x - 1] || null,
+      this.dots[y][x - 1] || null,
       // right
-      this.dots[y]?.[x + 1] || null,
+      this.dots[y][x + 1] || null,
       // bottom left
-      this.dots[y + 1]?.[x - 1] || null,
+      (this.dots[y + 1] != null && this.dots[y + 1][x - 1]) || null,
       // bottom
-      this.dots[y + 1]?.[x] || null,
+      (this.dots[y + 1] != null && this.dots[y + 1][x]) || null,
       // bottom right
-      this.dots[y + 1]?.[x + 1] || null,
+      (this.dots[y + 1] != null && this.dots[y + 1][x + 1]) || null,
     ];
-  };
-  openDot = (x: number, y: number) => {
+  }
+  openDot(x: number, y: number) {
+    // FIXME: remove this and use open method given.
     // row index is y, so...
-    this.open(y, x);
-  };
+    const openResult = this.open(y, x);
+    console.log(`opening ${x}, ${y}, result: ${openResult}`);
+    // if open result is mine, the game is over, so don't need to worry about it.
+    const number = parseInt(openResult as string);
+    if (isNaN(number)) {
+      throw new Error("Unexpected open result");
+    }
+    this.dots[y][x].type = "number";
+    this.dots[y][x].value = number;
+  }
+  // dummy open function
+  // FIXME: remove this
+  open(row: number, col: number): string {
+    return "0";
+  }
 
-  printMap = () => {
+  markAsMine(x: number, y: number) {
+    this.dots[y][x].type = "mine";
+  }
+
+  printMap() {
     this.dots.forEach((line) => {
       console.log(
         line
@@ -81,10 +124,13 @@ class MineSweeperMap {
           .join(" ")
       );
     });
-  };
+  }
 
-  // dummy open function
-  open = (row: number, col: number) => {};
+  checkIsCleared() {
+    return this.dots.every((line) =>
+      line.every((dot) => dot.type === "number" || dot.type === "mine")
+    );
+  }
 }
 const mineSweeperMain = () => {
   const map = `? ? ? ? ? ?
